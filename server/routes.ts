@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { upload, handleUploadErrors, deleteFile, getFilePath } from "./fileStorage";
+import { saveArticleText, readArticleText, convertArticleToPdf, addContent, updateContent, deleteContent, getAllContent, getContentById, getContentByType, getContentByDepartment } from "./contentStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints prefix
@@ -161,6 +162,187 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('خطأ في حذف الملف:', error);
       return res.status(500).json({ error: 'فشل في حذف الملف' });
+    }
+  });
+
+  // ===================== مسارات المحتوى الجديدة =======================
+  
+  // ==================== مسارات خاصة بالمقالات النصية ====================
+  
+  // حفظ مقال نصي جديد
+  app.post(`${apiPrefix}/articles/text`, async (req: Request, res: Response) => {
+    try {
+      const { id, title, content } = req.body;
+      
+      if (!id || !title || !content) {
+        return res.status(400).json({ error: 'جميع الحقول (id, title, content) مطلوبة' });
+      }
+      
+      const fileName = await saveArticleText(id, title, content);
+      
+      return res.status(200).json({
+        message: 'تم حفظ المقال بنجاح',
+        fileName: fileName,
+        fileUrl: `/api/articles/text/${fileName}`
+      });
+    } catch (error) {
+      console.error('خطأ في حفظ المقال:', error);
+      return res.status(500).json({ error: 'فشل في حفظ المقال', details: (error as Error).message });
+    }
+  });
+  
+  // قراءة محتوى مقال نصي
+  app.get(`${apiPrefix}/articles/text/:fileName`, async (req: Request, res: Response) => {
+    try {
+      const fileName = req.params.fileName;
+      
+      if (!fileName) {
+        return res.status(400).json({ error: 'اسم الملف مطلوب' });
+      }
+      
+      const content = await readArticleText(fileName);
+      
+      return res.status(200).json({
+        content: content
+      });
+    } catch (error) {
+      console.error('خطأ في قراءة المقال:', error);
+      return res.status(404).json({ error: 'المقال غير موجود', details: (error as Error).message });
+    }
+  });
+  
+  // تحويل مقال نصي إلى PDF (HTML في الوقت الحالي)
+  app.get(`${apiPrefix}/articles/pdf/:id/:title`, async (req: Request, res: Response) => {
+    try {
+      const { id, title } = req.params;
+      
+      if (!id || !title) {
+        return res.status(400).json({ error: 'معرف المقال والعنوان مطلوبان' });
+      }
+      
+      // تحويل المقال إلى PDF (HTML حاليًا)
+      const htmlFilePath = await convertArticleToPdf(id, title);
+      
+      // إرسال الملف كاستجابة
+      return res.download(htmlFilePath);
+    } catch (error) {
+      console.error('خطأ في تحويل المقال إلى PDF:', error);
+      return res.status(500).json({ error: 'فشل في تحويل المقال إلى PDF', details: (error as Error).message });
+    }
+  });
+  
+  // ==================== مسارات لإدارة المحتوى الجديدة ====================
+  
+  // إضافة محتوى جديد
+  app.post(`${apiPrefix}/content`, async (req: Request, res: Response) => {
+    try {
+      const contentData = req.body;
+      
+      if (!contentData.title || !contentData.description || !contentData.contentType || !contentData.authorName) {
+        return res.status(400).json({ error: 'بعض الحقول المطلوبة غير متوفرة' });
+      }
+      
+      const newContent = await addContent(contentData);
+      
+      return res.status(201).json(newContent);
+    } catch (error) {
+      console.error('خطأ في إضافة المحتوى:', error);
+      return res.status(500).json({ error: 'فشل في إضافة المحتوى', details: (error as Error).message });
+    }
+  });
+  
+  // تحديث محتوى موجود
+  app.put(`${apiPrefix}/content/:id`, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const contentData = req.body;
+      
+      const updatedContent = await updateContent(id, contentData);
+      
+      if (!updatedContent) {
+        return res.status(404).json({ error: 'المحتوى غير موجود' });
+      }
+      
+      return res.status(200).json(updatedContent);
+    } catch (error) {
+      console.error('خطأ في تحديث المحتوى:', error);
+      return res.status(500).json({ error: 'فشل في تحديث المحتوى', details: (error as Error).message });
+    }
+  });
+  
+  // حذف محتوى
+  app.delete(`${apiPrefix}/content/:id`, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const deleted = await deleteContent(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ error: 'المحتوى غير موجود' });
+      }
+      
+      return res.status(200).json({ message: 'تم حذف المحتوى بنجاح' });
+    } catch (error) {
+      console.error('خطأ في حذف المحتوى:', error);
+      return res.status(500).json({ error: 'فشل في حذف المحتوى', details: (error as Error).message });
+    }
+  });
+  
+  // الحصول على كل المحتويات
+  app.get(`${apiPrefix}/contents`, async (req: Request, res: Response) => {
+    try {
+      const contents = await getAllContent();
+      
+      return res.status(200).json(contents);
+    } catch (error) {
+      console.error('خطأ في جلب المحتويات:', error);
+      return res.status(500).json({ error: 'فشل في جلب المحتويات', details: (error as Error).message });
+    }
+  });
+  
+  // الحصول على محتوى محدد بالمعرف
+  app.get(`${apiPrefix}/contents/:id`, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const content = await getContentById(id);
+      
+      if (!content) {
+        return res.status(404).json({ error: 'المحتوى غير موجود' });
+      }
+      
+      return res.status(200).json(content);
+    } catch (error) {
+      console.error('خطأ في جلب المحتوى:', error);
+      return res.status(500).json({ error: 'فشل في جلب المحتوى', details: (error as Error).message });
+    }
+  });
+  
+  // الحصول على المحتويات حسب النوع
+  app.get(`${apiPrefix}/contents/type/:contentType`, async (req: Request, res: Response) => {
+    try {
+      const contentType = req.params.contentType;
+      
+      const contents = await getContentByType(contentType);
+      
+      return res.status(200).json(contents);
+    } catch (error) {
+      console.error('خطأ في جلب المحتويات حسب النوع:', error);
+      return res.status(500).json({ error: 'فشل في جلب المحتويات حسب النوع', details: (error as Error).message });
+    }
+  });
+  
+  // الحصول على المحتويات حسب القسم
+  app.get(`${apiPrefix}/contents/department/:department`, async (req: Request, res: Response) => {
+    try {
+      const department = req.params.department;
+      
+      const contents = await getContentByDepartment(department);
+      
+      return res.status(200).json(contents);
+    } catch (error) {
+      console.error('خطأ في جلب المحتويات حسب القسم:', error);
+      return res.status(500).json({ error: 'فشل في جلب المحتويات حسب القسم', details: (error as Error).message });
     }
   });
 
