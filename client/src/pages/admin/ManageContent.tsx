@@ -519,7 +519,14 @@ export default function ManageContent() {
     if (!selectedContent) return;
     
     try {
-      await deleteContent(selectedContent.id);
+      // استخدام واجهة API للخادم لحذف المحتوى
+      const response = await fetch(`/api/content/${selectedContent.id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في حذف المحتوى');
+      }
       
       toast({
         title: "تم حذف المحتوى بنجاح",
