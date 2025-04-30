@@ -8,8 +8,8 @@ import { DocumentData } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Articles() {
-  const [articles, setArticles] = useState<DocumentData[]>([]);
-  const [filteredArticles, setFilteredArticles] = useState<DocumentData[]>([]);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -34,7 +34,7 @@ export default function Articles() {
     let filtered = [...articles];
     
     // Apply department filter
-    if (filter) {
+    if (filter && filter !== 'all') {
       filtered = filtered.filter(article => article.department === filter);
     }
     
@@ -83,7 +83,7 @@ export default function Articles() {
               <SelectValue placeholder="جميع الأقسام" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">جميع الأقسام</SelectItem>
+              <SelectItem value="all">جميع الأقسام</SelectItem>
               {Object.entries(departmentNames).map(([value, label]) => (
                 <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}

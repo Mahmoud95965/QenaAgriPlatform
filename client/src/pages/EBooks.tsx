@@ -9,8 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Book } from "lucide-react";
 
 export default function EBooks() {
-  const [ebooks, setEbooks] = useState<DocumentData[]>([]);
-  const [filteredEbooks, setFilteredEbooks] = useState<DocumentData[]>([]);
+  const [ebooks, setEbooks] = useState<any[]>([]);
+  const [filteredEbooks, setFilteredEbooks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [departmentFilter, setDepartmentFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");

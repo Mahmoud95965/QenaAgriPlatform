@@ -8,8 +8,8 @@ import { DocumentData } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RecentContentSection() {
-  const [contentItems, setContentItems] = useState<DocumentData[]>([]);
-  const [filteredItems, setFilteredItems] = useState<DocumentData[]>([]);
+  const [contentItems, setContentItems] = useState<any[]>([]);
+  const [filteredItems, setFilteredItems] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
 
