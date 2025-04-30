@@ -28,28 +28,45 @@ export const loginWithEmailPassword = (email: string, password: string): Promise
 };
 
 export const registerWithEmailPassword = async (email: string, password: string, userData: Partial<InsertUser>): Promise<UserCredential> => {
+  console.log("Starting user registration with:", { email, userData });
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   
   if (userCredential.user) {
     // Update display name if provided
     if (userData.displayName) {
+      console.log("Updating display name to:", userData.displayName);
       await updateProfile(userCredential.user, {
         displayName: userData.displayName
       });
     }
     
-    // Store additional user data in Firestore
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-      uid: userCredential.user.uid,
-      email: userCredential.user.email,
-      username: userData.username || email.split('@')[0],
-      displayName: userData.displayName || "",
-      role: userData.role || UserRole.STUDENT,
-      department: userData.department || null,
-      studentId: userData.studentId || null,
-      profilePicture: userCredential.user.photoURL || null,
-      createdAt: new Date()
+    // استخدام وظيفة createUserDocument لإنشاء وثيقة المستخدم
+    const role = userData.role || UserRole.STUDENT;
+    console.log("Creating user document with role:", role);
+    
+    // إنشاء كائن المستخدم مع الخصائص المخصصة
+    const user = userCredential.user;
+    // تعديل العرض لتشمل البيانات المخصصة
+    Object.defineProperty(user, 'customData', {
+      value: {
+        displayName: userData.displayName,
+        username: userData.username || email.split('@')[0],
+        department: userData.department,
+        studentId: userData.studentId
+      },
+      writable: false
     });
+    
+    await createUserDocument(user, role);
+    
+    // إضافة البيانات الإضافية التي لم تتضمنها وظيفة createUserDocument
+    if (userData.department || userData.studentId) {
+      console.log("Updating additional user data:", { department: userData.department, studentId: userData.studentId });
+      await updateDoc(doc(db, "users", userCredential.user.uid), {
+        department: userData.department || null,
+        studentId: userData.studentId || null
+      });
+    }
   }
   
   return userCredential;
@@ -86,22 +103,40 @@ export const createUserDocument = async (user: any, role: string = UserRole.STUD
   try {
     console.log("Creating user document for:", user.uid);
     
+    // الاحتفاظ بمعلومات أساسية فقط لتجنب أي أخطاء
     const userData = {
       displayName: user.displayName || "User",
-      email: user.email,
-      username: user.email?.split('@')[0] || "user",
+      email: user.email || "",
+      username: user.email ? user.email.split('@')[0] : "user",
       role: role,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       id: user.uid
     };
     
+    // طباعة البيانات قبل حفظها في Firestore
+    console.log("About to create document with data:", userData);
+    
+    // إنشاء الوثيقة في Firestore
     await setDoc(doc(db, "users", user.uid), userData);
-    console.log("User document created successfully:", userData);
+    console.log("User document created successfully for:", user.uid);
     
     return userData;
   } catch (error) {
-    console.error("Error creating user document:", error);
-    throw error;
+    console.error("Detailed error creating user document:", error);
+    // محاولة أخرى باستخدام بيانات محدودة جدًا
+    try {
+      const minimalData = {
+        email: user.email || "",
+        role: role,
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(doc(db, "users", user.uid), minimalData);
+      console.log("Created user document with minimal data");
+      return minimalData;
+    } catch (secondError) {
+      console.error("Even minimal data failed:", secondError);
+      throw error; // إعادة الخطأ الأصلي
+    }
   }
 };
 

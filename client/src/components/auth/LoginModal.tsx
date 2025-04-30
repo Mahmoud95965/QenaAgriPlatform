@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+// استيراد زائف للتأكد من أن الوحدة تعرف الدوال
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { loginWithEmailPassword, loginWithGoogle, db } from "@/lib/firebase";
+import { loginWithEmailPassword, loginWithGoogle, db, createUserDocument, updateUserRole } from "@/lib/firebase";
 import { getDoc, doc, setDoc } from "firebase/firestore";
 import { UserRole } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -59,22 +60,23 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }: LoginModal
           const userDoc = await getDoc(doc(db, "users", user.uid));
           
           if (!userDoc.exists()) {
-            console.log("Creating admin user document for:", user.uid);
-            // إنشاء وثيقة مستخدم إذا لم تكن موجودة
-            await setDoc(doc(db, "users", user.uid), {
-              displayName: "Mahmoud Admin",
-              email: "mahmoud@gmailcom",
-              role: UserRole.ADMIN,
-              username: "mahmoud",
-              createdAt: new Date(),
-              id: user.uid
-            });
-            console.log("Admin user document created successfully");
+            console.log("Creating admin user document with createUserDocument function");
+            
+            // استخدام الوظيفة الجديدة لإنشاء وثيقة المستخدم المسؤول
+            await createUserDocument(user, UserRole.ADMIN);
+            console.log("Admin user document created successfully through createUserDocument");
           } else {
-            console.log("Admin user document already exists");
+            console.log("Admin user document already exists, checking role");
+            
+            // التأكد من أن المستخدم لديه دور المسؤول
+            const userData = userDoc.data();
+            if (userData.role !== UserRole.ADMIN) {
+              console.log("Updating user to admin role");
+              await updateUserRole(user.uid, UserRole.ADMIN);
+            }
           }
         } catch (err) {
-          console.error("Error creating admin document:", err);
+          console.error("Error handling admin document:", err);
         }
       }
       
@@ -107,16 +109,9 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }: LoginModal
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
         if (!userDoc.exists()) {
-          console.log("Creating user document after Google login:", user.uid);
-          // إنشاء وثيقة مستخدم إذا لم تكن موجودة
-          await setDoc(doc(db, "users", user.uid), {
-            displayName: user.displayName || "User",
-            email: user.email,
-            role: UserRole.STUDENT, // افتراضيًا طالب
-            username: user.email?.split('@')[0] || "user",
-            createdAt: new Date(),
-            id: user.uid
-          });
+          console.log("Creating user document after Google login using createUserDocument");
+          // استخدام الوظيفة الجديدة لإنشاء وثيقة المستخدم
+          await createUserDocument(user, UserRole.STUDENT);
           console.log("User document created successfully after Google login");
         } else {
           console.log("User document already exists for Google login");
