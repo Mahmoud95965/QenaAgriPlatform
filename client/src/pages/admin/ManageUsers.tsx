@@ -688,15 +688,28 @@ export default function ManageUsers() {
           
           <div className="py-2 space-y-4">
             <div className="bg-neutral-50 p-4 rounded-md text-sm text-neutral-700">
-              <p className="font-bold mb-2">يجب أن يحتوي ملف Excel على الأعمدة التالية:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li><span className="font-medium">name:</span> الاسم الكامل للمستخدم</li>
-                <li><span className="font-medium">email:</span> البريد الإلكتروني</li>
-                <li><span className="font-medium">password:</span> كلمة المرور</li>
-                <li><span className="font-medium">role:</span> الصلاحية (student, professor, admin)</li>
-                <li><span className="font-medium">studentId:</span> (اختياري) الرقم الجامعي للطالب</li>
-                <li><span className="font-medium">department:</span> (اختياري) القسم</li>
-              </ul>
+              <p className="font-bold mb-2">معلومات هامة عن تنسيق الملف:</p>
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-green-700">✓ يدعم النظام نوعين من ملفات Excel:</h3>
+                  <ol className="list-decimal list-inside mr-4 mt-1 space-y-1">
+                    <li><span className="font-medium">ملف ايميلات الطلاب:</span> عمود واحد فقط يحتوي على بريد الطالب الجامعي</li>
+                    <li><span className="font-medium">ملف بيانات كاملة:</span> يحتوي على أعمدة البيانات التفصيلية أدناه</li>
+                  </ol>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold text-amber-700">الأعمدة المطلوبة للملف التفصيلي:</h3>
+                  <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                    <li><span className="font-medium">name:</span> الاسم الكامل للمستخدم</li>
+                    <li><span className="font-medium">email:</span> البريد الإلكتروني</li>
+                    <li><span className="font-medium">password:</span> كلمة المرور</li>
+                    <li><span className="font-medium">role:</span> الصلاحية (student, professor, admin)</li>
+                    <li><span className="font-medium">studentId:</span> (اختياري) الرقم الجامعي للطالب</li>
+                    <li><span className="font-medium">department:</span> (اختياري) القسم</li>
+                  </ul>
+                </div>
+              </div>
             </div>
             
             <div>
