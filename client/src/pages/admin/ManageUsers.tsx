@@ -388,22 +388,22 @@ export default function ManageUsers() {
               <h2 className="text-lg font-bold text-neutral-800 mb-4">لوحة التحكم</h2>
               <nav className="space-y-2">
                 <Link href="/admin/dashboard">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors cursor-pointer">
                     <LayoutDashboard className="w-5 h-5 ml-2" />
                     الرئيسية
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/admin/content">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors cursor-pointer">
                     <File className="w-5 h-5 ml-2" />
                     إدارة المحتوى
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/admin/users">
-                  <a className="flex items-center p-2 text-neutral-700 rounded-md bg-neutral-100 font-medium">
+                  <span className="flex items-center p-2 text-neutral-700 rounded-md bg-neutral-100 font-medium cursor-pointer">
                     <Users className="w-5 h-5 ml-2" />
                     إدارة المستخدمين
-                  </a>
+                  </span>
                 </Link>
               </nav>
             </div>
