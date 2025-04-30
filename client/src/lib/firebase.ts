@@ -245,11 +245,32 @@ export const createUsersFromExcel = async (file: File): Promise<{ success: Excel
 export const addContent = async (content: InsertContent, file?: File): Promise<string> => {
   let fileUrl = content.fileUrl || "";
   
+  // تم تغيير هذه الوظيفة لتعتمد على واجهة API للخادم بدلاً من Firebase Storage مباشرة
   // Upload file if provided
   if (file) {
-    const storageRef = ref(storage, `content/${content.contentType}/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    fileUrl = await getDownloadURL(storageRef);
+    try {
+      // إنشاء نموذج بيانات لإرسال الملف
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('contentType', content.contentType);
+      formData.append('title', content.title);
+      
+      // إرسال الملف إلى الخادم
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في رفع الملف');
+      }
+      
+      const data = await response.json();
+      fileUrl = data.fileUrl;
+    } catch (error) {
+      console.error('خطأ في رفع الملف:', error);
+      throw error;
+    }
   }
   
   const docRef = await addDoc(collection(db, "contents"), {
