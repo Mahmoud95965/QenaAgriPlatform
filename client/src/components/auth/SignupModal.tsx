@@ -71,6 +71,14 @@ export default function SignupModal({ isOpen, onClose, onOpenLogin }: SignupModa
     try {
       const displayName = `${values.firstName} ${values.lastName}`;
       
+      // التحقق من رمز المسؤول إذا كان نوع الحساب مسؤول
+      if (values.role === 'admin') {
+        // رمز التحقق الصحيح هو Agri159208#
+        if (!values.adminVerificationCode || values.adminVerificationCode !== 'Agri159208#') {
+          throw new Error('رمز التحقق غير صحيح');
+        }
+      }
+      
       await registerWithEmailPassword(values.email, values.password, {
         displayName,
         username: values.email.split('@')[0],
@@ -85,11 +93,11 @@ export default function SignupModal({ isOpen, onClose, onOpenLogin }: SignupModa
       });
       
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast({
         title: "فشل إنشاء الحساب",
-        description: "حدث خطأ أثناء إنشاء الحساب، يرجى المحاولة مرة أخرى",
+        description: error.message || "حدث خطأ أثناء إنشاء الحساب، يرجى المحاولة مرة أخرى",
         variant: "destructive",
       });
     } finally {
