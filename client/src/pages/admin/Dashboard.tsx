@@ -169,6 +169,12 @@ export default function AdminDashboard() {
                     إنشاء حساب مسؤول
                   </span>
                 </Link>
+                <Link href="/admin/actions">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm cursor-pointer bg-rose-50 border border-rose-100">
+                    <Shield className="w-4 h-4 ml-2 text-rose-600" />
+                    إجراءات متقدمة
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
