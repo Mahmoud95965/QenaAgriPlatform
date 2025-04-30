@@ -649,9 +649,9 @@ export default function ManageUsers() {
                     <SelectValue placeholder="اختر الصلاحية" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={UserRole.STUDENT}>طالب</SelectItem>
-                    <SelectItem value={UserRole.PROFESSOR}>دكتور</SelectItem>
-                    <SelectItem value={UserRole.ADMIN}>مسؤول</SelectItem>
+                    <SelectItem value="student">طالب</SelectItem>
+                    <SelectItem value="professor">دكتور</SelectItem>
+                    <SelectItem value="admin">مسؤول</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
