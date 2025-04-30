@@ -10,7 +10,7 @@ import { ExternalLink, Download, FileText, File } from "lucide-react";
 
 interface ContentCardProps {
   content: {
-    id: string;
+    id: string | number;
     title: string;
     description: string;
     contentType: ContentTypeType;
@@ -19,7 +19,7 @@ interface ContentCardProps {
     fileUrl?: string;
     externalLink?: string;
     thumbnailUrl?: string;
-    createdAt: { toDate: () => Date };
+    createdAt: string | { toDate: () => Date };
     department?: string;
   };
 }
