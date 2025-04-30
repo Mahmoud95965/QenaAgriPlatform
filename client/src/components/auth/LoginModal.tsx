@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginWithEmailPassword, loginWithGoogle, db } from "@/lib/firebase";
 import { getDoc, doc, setDoc } from "firebase/firestore";
+import { UserRole } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -63,9 +64,10 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }: LoginModal
             await setDoc(doc(db, "users", user.uid), {
               displayName: "Mahmoud Admin",
               email: "mahmoud@gmailcom",
-              role: "admin",
+              role: UserRole.ADMIN,
               username: "mahmoud",
-              createdAt: new Date()
+              createdAt: new Date(),
+              id: user.uid
             });
             console.log("Admin user document created successfully");
           } else {
@@ -96,7 +98,31 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }: LoginModal
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      await loginWithGoogle();
+      const userCredential = await loginWithGoogle();
+      console.log("Google login successful:", userCredential);
+      
+      // التحقق إذا كان المستخدم موجود بالفعل في Firestore
+      if (userCredential?.user) {
+        const user = userCredential.user;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if (!userDoc.exists()) {
+          console.log("Creating user document after Google login:", user.uid);
+          // إنشاء وثيقة مستخدم إذا لم تكن موجودة
+          await setDoc(doc(db, "users", user.uid), {
+            displayName: user.displayName || "User",
+            email: user.email,
+            role: UserRole.STUDENT, // افتراضيًا طالب
+            username: user.email?.split('@')[0] || "user",
+            createdAt: new Date(),
+            id: user.uid
+          });
+          console.log("User document created successfully after Google login");
+        } else {
+          console.log("User document already exists for Google login");
+        }
+      }
+      
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحبًا بعودتك إلى منصة كلية الزراعة بقنا",
