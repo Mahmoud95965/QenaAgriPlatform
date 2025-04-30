@@ -18,9 +18,10 @@ const signupSchema = z.object({
   lastName: z.string().min(2, { message: "يجب أن يتكون الاسم الأخير من حرفين على الأقل" }),
   email: z.string().email({ message: "يرجى إدخال بريد إلكتروني صحيح" }),
   password: z.string().min(6, { message: "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل" }),
-  role: z.enum(["student", "professor"], { 
+  role: z.enum(["student", "professor", "admin"], { 
     required_error: "يرجى اختيار نوع الحساب" 
   }),
+  adminVerificationCode: z.string().optional(),
   studentId: z.string().optional(),
   department: z.string().optional(),
   terms: z.boolean().refine(val => val === true, {
@@ -49,17 +50,20 @@ export default function SignupModal({ isOpen, onClose, onOpenLogin }: SignupModa
       email: "",
       password: "",
       role: "student",
+      adminVerificationCode: "",
       studentId: "",
       department: "",
       terms: false,
     },
   });
 
-  // Watch for role changes to show/hide student fields
+  // Watch for role changes to show/hide specific fields
   const role = form.watch("role");
+  const [showAdminVerification, setShowAdminVerification] = useState(false);
   
   useEffect(() => {
     setShowStudentFields(role === "student");
+    setShowAdminVerification(role === "admin");
   }, [role]);
 
   const onSubmit = async (values: SignupFormValues) => {
@@ -219,6 +223,7 @@ export default function SignupModal({ isOpen, onClose, onOpenLogin }: SignupModa
                       <SelectContent>
                         <SelectItem value="student">طالب</SelectItem>
                         <SelectItem value="professor">دكتور</SelectItem>
+                        <SelectItem value="admin">مسؤول</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -276,6 +281,28 @@ export default function SignupModal({ isOpen, onClose, onOpenLogin }: SignupModa
                     )}
                   />
                 </div>
+              )}
+              
+              {showAdminVerification && (
+                <FormField
+                  control={form.control}
+                  name="adminVerificationCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-neutral-700">رمز الإثبات</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          placeholder="أدخل رمز إثبات المسؤول" 
+                          type="password"
+                          disabled={isLoading}
+                          className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               )}
               
               <FormField
