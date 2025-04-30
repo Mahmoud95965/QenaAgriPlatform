@@ -166,8 +166,18 @@ export default function Profile() {
   };
   
   if (!user || !userData) {
-    return null;
+    // يمكننا إضافة رسالة تحميل هنا بدلاً من إرجاع null
+    return (
+      <div className="min-h-screen py-12 bg-neutral-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-neutral-600">جاري تحميل بيانات الملف الشخصي...</p>
+        </div>
+      </div>
+    );
   }
+  
+  // طباعة بيانات المستخدم في وحدة التحكم لأغراض التصحيح
+  console.log("User data in profile:", userData);
   
   return (
     <div className="min-h-screen py-12 bg-neutral-100">

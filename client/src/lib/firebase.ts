@@ -65,8 +65,21 @@ export const logoutUser = (): Promise<void> => {
 
 // User management functions
 export const getUserByUid = async (uid: string): Promise<DocumentData | null> => {
-  const userDoc = await getDoc(doc(db, "users", uid));
-  return userDoc.exists() ? userDoc.data() : null;
+  try {
+    console.log("Getting user by UID:", uid);
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (userDoc.exists()) {
+      const userData = { id: userDoc.id, ...userDoc.data() };
+      console.log("User data retrieved:", userData);
+      return userData;
+    } else {
+      console.log("No user document found with UID:", uid);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in getUserByUid:", error);
+    return null;
+  }
 };
 
 export const updateUserRole = async (uid: string, role: string): Promise<void> => {
