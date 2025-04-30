@@ -119,8 +119,8 @@ export default function ManageContent() {
     // Check if we should open the add form based on URL params
     if (actionParam === "new") {
       setIsAddMode(true);
-      if (typeParam && Object.values(ContentType).includes(typeParam as ContentType[keyof typeof ContentType])) {
-        form.setValue("contentType", typeParam as ContentType[keyof typeof ContentType]);
+      if (typeParam && Object.values(ContentType).includes(typeParam as ContentTypeType)) {
+        form.setValue("contentType", typeParam as ContentTypeType);
       }
     }
   }, [actionParam, typeParam]);
@@ -479,10 +479,10 @@ export default function ManageContent() {
                   </span>
                 </Link>
                 <Link href="/admin/users">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors cursor-pointer">
                     <Users className="w-5 h-5 ml-2" />
                     إدارة المستخدمين
-                  </a>
+                  </span>
                 </Link>
               </nav>
             </div>
