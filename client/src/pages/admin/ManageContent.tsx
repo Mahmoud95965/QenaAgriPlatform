@@ -571,7 +571,7 @@ export default function ManageContent() {
           toast({
             title: "تنبيه",
             description: "لم نتمكن من تحميل نص المقال، يمكنك إدخال نص جديد",
-            variant: "warning",
+            variant: "destructive",
           });
         }
       } catch (error) {
