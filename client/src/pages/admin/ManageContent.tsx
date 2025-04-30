@@ -36,7 +36,7 @@ import {
   QueryDocumentSnapshot
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ContentType, Department, InsertContent } from "@shared/schema";
+import { ContentType, ContentTypeType, Department, InsertContent } from "@shared/schema";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -119,8 +119,8 @@ export default function ManageContent() {
     // Check if we should open the add form based on URL params
     if (actionParam === "new") {
       setIsAddMode(true);
-      if (typeParam && Object.values(ContentType).includes(typeParam as ContentTypeType)) {
-        form.setValue("contentType", typeParam as ContentTypeType);
+      if (typeParam && (typeParam === ContentType.ARTICLE || typeParam === ContentType.EBOOK || typeParam === ContentType.PROJECT)) {
+        form.setValue("contentType", typeParam as any);
       }
     }
   }, [actionParam, typeParam]);
