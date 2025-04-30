@@ -55,6 +55,7 @@
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
   --primary: 120 45% 35%;  /* Slightly brighter green for dark mode */
+  --primary-dark: 120 45% 30%;  /* Darker green for hover states in dark mode */
   --primary-foreground: 211 100% 99%;
   --secondary: 25 70% 45%;  /* Slightly brighter earthy tone for dark mode */
   --secondary-foreground: 0 0% 98%;
