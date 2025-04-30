@@ -1,6 +1,7 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
+import fs from "fs";
 import { storage } from "./storage";
 import { upload, handleUploadErrors, deleteFile, getFilePath } from "./fileStorage";
 
@@ -92,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // مسارات رفع وتنزيل الملفات
   
   // مسار لرفع ملف جديد
-  app.post(`${apiPrefix}/upload`, upload.single('file'), (req, res) => {
+  app.post(`${apiPrefix}/upload`, upload.single('file'), (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'لم يتم تقديم أي ملف' });
@@ -121,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, handleUploadErrors);
   
   // مسار لتنزيل ملف
-  app.get(`${apiPrefix}/download/:contentType/:filename`, (req, res) => {
+  app.get(`${apiPrefix}/download/:contentType/:filename`, (req: Request, res: Response) => {
     try {
       const { contentType, filename } = req.params;
       
@@ -142,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // مسار لحذف ملف
-  app.delete(`${apiPrefix}/files/:contentType/:filename`, (req, res) => {
+  app.delete(`${apiPrefix}/files/:contentType/:filename`, (req: Request, res: Response) => {
     try {
       const { contentType, filename } = req.params;
       

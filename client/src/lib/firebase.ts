@@ -287,19 +287,72 @@ export const updateContent = async (id: string, content: Partial<InsertContent>,
   const contentRef = doc(db, "contents", id);
   let updatedContent = { ...content, updatedAt: new Date() };
   
-  // Upload new file if provided
+  // تحميل ملف جديد إذا تم تقديمه
   if (file) {
-    const storageRef = ref(storage, `content/${content.contentType}/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const fileUrl = await getDownloadURL(storageRef);
-    updatedContent.fileUrl = fileUrl;
+    try {
+      // إنشاء نموذج بيانات لإرسال الملف
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('contentType', content.contentType as string);
+      formData.append('title', content.title || 'بدون عنوان');
+      
+      // إرسال الملف إلى الخادم
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في رفع الملف');
+      }
+      
+      const data = await response.json();
+      updatedContent.fileUrl = data.fileUrl;
+    } catch (error) {
+      console.error('خطأ في رفع الملف:', error);
+      throw error;
+    }
   }
   
   await updateDoc(contentRef, updatedContent);
 };
 
 export const deleteContent = async (id: string): Promise<void> => {
-  await deleteDoc(doc(db, "contents", id));
+  try {
+    // أولاً، نحتاج إلى الحصول على وثيقة المحتوى للحصول على معلومات الملف
+    const contentDoc = await getDoc(doc(db, "contents", id));
+    
+    if (contentDoc.exists()) {
+      const contentData = contentDoc.data();
+      
+      // إذا كان هناك ملف مرتبط بهذا المحتوى، فسنحاول حذفه أولاً
+      if (contentData.fileUrl) {
+        // استخراج اسم الملف ونوع المحتوى من عنوان URL
+        const urlParts = contentData.fileUrl.split('/');
+        if (urlParts.length >= 3) {
+          const filename = urlParts[urlParts.length - 1];
+          const contentType = urlParts[urlParts.length - 2];
+          
+          // محاولة حذف الملف من الخادم
+          try {
+            await fetch(`/api/files/${contentType}/${filename}`, {
+              method: 'DELETE',
+            });
+            console.log('تم حذف الملف من الخادم');
+          } catch (fileError) {
+            console.error('فشل في حذف الملف من الخادم:', fileError);
+            // نستمر في حذف الوثيقة حتى لو فشل حذف الملف
+          }
+        }
+      }
+    }
+    
+    // حذف وثيقة المحتوى من Firestore
+    await deleteDoc(doc(db, "contents", id));
+  } catch (error) {
+    console.error('خطأ في حذف المحتوى:', error);
+    throw error;
+  }
 };
 
 export const getContentByType = async (contentType: string, departmentFilter?: string, limitCount = 10): Promise<DocumentData[]> => {
