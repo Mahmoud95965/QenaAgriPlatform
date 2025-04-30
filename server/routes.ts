@@ -1,10 +1,10 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { upload, handleUploadErrors, deleteFile, getFilePath } from "./fileStorage";
-import { saveArticleText, readArticleText, convertArticleToPdf, addContent, updateContent, deleteContent, getAllContent, getContentById, getContentByType, getContentByDepartment } from "./contentStorage";
+import { saveArticleText, readArticleText, convertArticleToPdf, ensureContentDirectories } from "./contentStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints prefix
@@ -242,7 +242,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'بعض الحقول المطلوبة غير متوفرة' });
       }
       
-      const newContent = await addContent(contentData);
+      // إذا كان المحتوى مقالاً نصياً وتم تقديم نص المقال
+      if (contentData.contentType === 'article' && contentData.articleText) {
+        // حفظ نص المقال كملف
+        const articleId = Date.now().toString();
+        const fileName = await saveArticleText(articleId, contentData.title, contentData.articleText);
+        
+        // إضافة مسار الملف إلى بيانات المحتوى
+        contentData.articleTextPath = fileName;
+      }
+      
+      const newContent = await storage.createContent(contentData);
       
       return res.status(201).json(newContent);
     } catch (error) {
@@ -257,7 +267,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const contentData = req.body;
       
-      const updatedContent = await updateContent(id, contentData);
+      // إذا كان المحتوى مقالاً نصياً وتم تقديم نص المقال
+      if (contentData.contentType === 'article' && contentData.articleText) {
+        // الحصول على المحتوى الحالي
+        const existingContent = await storage.getContentById(id);
+        
+        // إذا كان هناك مسار ملف مقال موجود، فقم بتحديثه، أو أنشئ ملفاً جديداً
+        const articleId = existingContent?.articleTextPath?.split('_')[0] || Date.now().toString();
+        const fileName = await saveArticleText(articleId, contentData.title || existingContent?.title || 'Untitled', contentData.articleText);
+        
+        // إضافة مسار الملف إلى بيانات المحتوى
+        contentData.articleTextPath = fileName;
+      }
+      
+      const updatedContent = await storage.updateContent(id, contentData);
       
       if (!updatedContent) {
         return res.status(404).json({ error: 'المحتوى غير موجود' });
@@ -275,11 +298,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       
-      const deleted = await deleteContent(id);
-      
-      if (!deleted) {
+      // الحصول على المحتوى قبل حذفه للتحقق من الملفات المرتبطة
+      const content = await storage.getContentById(id);
+      if (!content) {
         return res.status(404).json({ error: 'المحتوى غير موجود' });
       }
+      
+      // حذف ملف المقال النصي إذا كان موجودًا
+      if (content.articleTextPath) {
+        try {
+          const filePath = path.join('./content/articles', content.articleTextPath);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (fileError) {
+          console.warn('خطأ في حذف ملف المقال:', fileError);
+          // استمر في عملية الحذف حتى لو فشل حذف الملف
+        }
+      }
+      
+      // حذف الملف المرفق إذا كان موجودًا
+      if (content.fileUrl) {
+        try {
+          const fileUrlParts = content.fileUrl.split('/');
+          const fileName = fileUrlParts[fileUrlParts.length - 1];
+          const contentType = fileUrlParts[fileUrlParts.length - 2];
+          const filePath = getFilePath(contentType, fileName);
+          
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (fileError) {
+          console.warn('خطأ في حذف الملف المرفق:', fileError);
+          // استمر في عملية الحذف حتى لو فشل حذف الملف
+        }
+      }
+      
+      const deleted = await storage.deleteContent(id);
       
       return res.status(200).json({ message: 'تم حذف المحتوى بنجاح' });
     } catch (error) {
@@ -291,7 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // الحصول على كل المحتويات
   app.get(`${apiPrefix}/contents`, async (req: Request, res: Response) => {
     try {
-      const contents = await getAllContent();
+      const contents = await storage.getAllContent();
       
       return res.status(200).json(contents);
     } catch (error) {
@@ -305,7 +360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       
-      const content = await getContentById(id);
+      const content = await storage.getContentById(id);
       
       if (!content) {
         return res.status(404).json({ error: 'المحتوى غير موجود' });
@@ -323,7 +378,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const contentType = req.params.contentType;
       
-      const contents = await getContentByType(contentType);
+      const contents = await storage.getContentByType(contentType);
       
       return res.status(200).json(contents);
     } catch (error) {
@@ -337,7 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const department = req.params.department;
       
-      const contents = await getContentByDepartment(department);
+      const contents = await storage.getContentByDepartment(department);
       
       return res.status(200).json(contents);
     } catch (error) {
