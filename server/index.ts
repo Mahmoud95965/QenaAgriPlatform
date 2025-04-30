@@ -4,8 +4,9 @@ import { setupVite, serveStatic, log } from "./vite";
 import fs from "fs";
 import path from "path";
 import { ContentType } from "@shared/schema";
+import { ensureContentDirectories } from "./contentStorage";
 
-// دالة للتأكد من وجود مجلدات التخزين
+// دالة للتأكد من وجود مجلدات التخزين للملفات المرفوعة
 function ensureUploadDirectories() {
   const uploadDir = path.join('.', 'uploads');
   const articleDir = path.join(uploadDir, 'articles');
@@ -57,6 +58,7 @@ app.use((req, res, next) => {
 (async () => {
   // التأكد من وجود مجلدات التخزين
   ensureUploadDirectories();
+  ensureContentDirectories();
   
   const server = await registerRoutes(app);
 
