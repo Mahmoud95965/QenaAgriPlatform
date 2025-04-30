@@ -22,6 +22,7 @@ import Profile from "@/pages/Profile";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import ManageContent from "@/pages/admin/ManageContent";
 import ManageUsers from "@/pages/admin/ManageUsers";
+import CreateAdmin from "@/pages/admin/CreateAdmin";
 
 function Router() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -58,6 +59,7 @@ function Router() {
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/admin/content" component={ManageContent} />
           <Route path="/admin/users" component={ManageUsers} />
+          <Route path="/admin/create-admin" component={CreateAdmin} />
           <Route component={NotFound} />
         </Switch>
       </main>
