@@ -323,12 +323,12 @@ export default function Profile() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="">بدون قسم</SelectItem>
-                                  <SelectItem value={Department.HORTICULTURE}>البساتين</SelectItem>
-                                  <SelectItem value={Department.CROPS}>المحاصيل</SelectItem>
-                                  <SelectItem value={Department.SOIL}>الأراضي والمياه</SelectItem>
-                                  <SelectItem value={Department.PROTECTION}>وقاية النبات</SelectItem>
-                                  <SelectItem value={Department.OTHER}>أخرى</SelectItem>
+                                  <SelectItem value="none">بدون قسم</SelectItem>
+                                  <SelectItem value="horticulture">البساتين</SelectItem>
+                                  <SelectItem value="crops">المحاصيل</SelectItem>
+                                  <SelectItem value="soil">الأراضي والمياه</SelectItem>
+                                  <SelectItem value="protection">وقاية النبات</SelectItem>
+                                  <SelectItem value="other">أخرى</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />

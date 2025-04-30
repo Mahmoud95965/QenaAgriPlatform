@@ -51,9 +51,9 @@ export default function RecentContentSection() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">جميع المحتويات</SelectItem>
-                <SelectItem value={ContentType.ARTICLE}>المقالات العلمية</SelectItem>
-                <SelectItem value={ContentType.EBOOK}>الكتب الإلكترونية</SelectItem>
-                <SelectItem value={ContentType.PROJECT}>مشاريع التخرج</SelectItem>
+                <SelectItem value="article">المقالات العلمية</SelectItem>
+                <SelectItem value="ebook">الكتب الإلكترونية</SelectItem>
+                <SelectItem value="project">مشاريع التخرج</SelectItem>
               </SelectContent>
             </Select>
           </div>
