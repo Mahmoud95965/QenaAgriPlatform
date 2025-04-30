@@ -76,8 +76,13 @@ export const insertContentSchema = createInsertSchema(contents).omit({
   updatedAt: true,
 });
 
+// إضافة حقل نص المقال الذي سيتم استخدامه في واجهة المستخدم فقط (غير مخزن في قاعدة البيانات)
+export const extendedInsertContentSchema = insertContentSchema.extend({
+  articleText: z.string().optional(),
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type InsertContent = z.infer<typeof insertContentSchema>;
+export type InsertContent = z.infer<typeof extendedInsertContentSchema>;
 export type Content = typeof contents.$inferSelect;

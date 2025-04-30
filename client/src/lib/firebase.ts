@@ -241,12 +241,12 @@ export const createUsersFromExcel = async (file: File): Promise<{ success: Excel
   });
 };
 
-// Content management functions
+// وظائف إدارة المحتوى مع استخدام واجهة API للخادم بدلاً من Firestore
 export const addContent = async (content: InsertContent, file?: File): Promise<string> => {
   let fileUrl = content.fileUrl || "";
+  let articleTextPath = null;
   
-  // تم تغيير هذه الوظيفة لتعتمد على واجهة API للخادم بدلاً من Firebase Storage مباشرة
-  // Upload file if provided
+  // رفع الملف إذا كان موجوداً
   if (file) {
     try {
       // إنشاء نموذج بيانات لإرسال الملف
@@ -273,30 +273,68 @@ export const addContent = async (content: InsertContent, file?: File): Promise<s
     }
   }
   
-  const docRef = await addDoc(collection(db, "contents"), {
-    ...content,
-    fileUrl,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
+  // إذا كان المحتوى مقالاً وتم تقديم نص
+  if (content.contentType === 'article' && content.articleText) {
+    try {
+      const response = await fetch('/api/articles/text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: Date.now().toString(), // استخدام الطابع الزمني كمعرف مؤقت
+          title: content.title,
+          content: content.articleText
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في حفظ نص المقال');
+      }
+      
+      const data = await response.json();
+      articleTextPath = data.fileName;
+    } catch (error) {
+      console.error('خطأ في حفظ نص المقال:', error);
+      // الاستمرار حتى مع وجود خطأ في حفظ النص
+    }
+  }
   
-  return docRef.id;
+  // إرسال بيانات المحتوى إلى الخادم
+  try {
+    const response = await fetch('/api/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...content,
+        fileUrl,
+        articleTextPath,
+        createdAt: new Date().toISOString()
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('فشل في إضافة المحتوى');
+    }
+    
+    const data = await response.json();
+    return data.id.toString();
+  } catch (error) {
+    console.error('خطأ في إضافة المحتوى:', error);
+    throw error;
+  }
 };
 
 export const updateContent = async (id: string, content: Partial<InsertContent>, file?: File): Promise<void> => {
-  const contentRef = doc(db, "contents", id);
-  let updatedContent = { ...content, updatedAt: new Date() };
+  let fileUrl = content.fileUrl;
+  let articleTextPath = content.articleTextPath;
   
-  // تحميل ملف جديد إذا تم تقديمه
+  // رفع ملف جديد إذا تم تقديمه
   if (file) {
     try {
-      // إنشاء نموذج بيانات لإرسال الملف
       const formData = new FormData();
       formData.append('file', file);
       formData.append('contentType', content.contentType as string);
       formData.append('title', content.title || 'بدون عنوان');
       
-      // إرسال الملف إلى الخادم
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -307,48 +345,70 @@ export const updateContent = async (id: string, content: Partial<InsertContent>,
       }
       
       const data = await response.json();
-      updatedContent.fileUrl = data.fileUrl;
+      fileUrl = data.fileUrl;
     } catch (error) {
       console.error('خطأ في رفع الملف:', error);
-      throw error;
+      // استمرار مع عملية التحديث
     }
   }
   
-  await updateDoc(contentRef, updatedContent);
+  // إذا كان المحتوى مقالاً وتم تقديم نص
+  if (content.contentType === 'article' && content.articleText) {
+    try {
+      const response = await fetch('/api/articles/text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: id, // استخدام نفس المعرف
+          title: content.title || 'عنوان المقال',
+          content: content.articleText
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في حفظ نص المقال');
+      }
+      
+      const data = await response.json();
+      articleTextPath = data.fileName;
+    } catch (error) {
+      console.error('خطأ في حفظ نص المقال:', error);
+      // استمرار مع عملية التحديث
+    }
+  }
+  
+  // تحديث بيانات المحتوى في الخادم
+  try {
+    const response = await fetch(`/api/content/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...content,
+        fileUrl,
+        articleTextPath,
+        updatedAt: new Date().toISOString()
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('فشل في تحديث المحتوى');
+    }
+  } catch (error) {
+    console.error('خطأ في تحديث المحتوى:', error);
+    throw error;
+  }
 };
 
 export const deleteContent = async (id: string): Promise<void> => {
   try {
-    // أولاً، نحتاج إلى الحصول على وثيقة المحتوى للحصول على معلومات الملف
-    const contentDoc = await getDoc(doc(db, "contents", id));
+    // حذف المحتوى من الخادم (سيتولى الخادم حذف الملفات المرتبطة)
+    const response = await fetch(`/api/content/${id}`, {
+      method: 'DELETE',
+    });
     
-    if (contentDoc.exists()) {
-      const contentData = contentDoc.data();
-      
-      // إذا كان هناك ملف مرتبط بهذا المحتوى، فسنحاول حذفه أولاً
-      if (contentData.fileUrl) {
-        // استخراج اسم الملف ونوع المحتوى من عنوان URL
-        const urlParts = contentData.fileUrl.split('/');
-        if (urlParts.length >= 3) {
-          const filename = urlParts[urlParts.length - 1];
-          const contentType = urlParts[urlParts.length - 2];
-          
-          // محاولة حذف الملف من الخادم
-          try {
-            await fetch(`/api/files/${contentType}/${filename}`, {
-              method: 'DELETE',
-            });
-            console.log('تم حذف الملف من الخادم');
-          } catch (fileError) {
-            console.error('فشل في حذف الملف من الخادم:', fileError);
-            // نستمر في حذف الوثيقة حتى لو فشل حذف الملف
-          }
-        }
-      }
+    if (!response.ok) {
+      throw new Error('فشل في حذف المحتوى');
     }
-    
-    // حذف وثيقة المحتوى من Firestore
-    await deleteDoc(doc(db, "contents", id));
   } catch (error) {
     console.error('خطأ في حذف المحتوى:', error);
     throw error;
@@ -356,42 +416,44 @@ export const deleteContent = async (id: string): Promise<void> => {
 };
 
 export const getContentByType = async (contentType: string, departmentFilter?: string, limitCount = 10): Promise<DocumentData[]> => {
-  let q = query(
-    collection(db, "contents"),
-    where("contentType", "==", contentType),
-    orderBy("createdAt", "desc"),
-    limit(limitCount)
-  );
-  
-  if (departmentFilter) {
-    q = query(
-      collection(db, "contents"),
-      where("contentType", "==", contentType),
-      where("department", "==", departmentFilter),
-      orderBy("createdAt", "desc"),
-      limit(limitCount)
-    );
+  try {
+    let url = `/api/contents/type/${contentType}`;
+    
+    // إذا تم توفير تصفية حسب القسم، فقم بإنشاء استعلام خاص
+    if (departmentFilter) {
+      url = `/api/contents/department/${departmentFilter}`;
+      // يمكن استخدام معاملات الاستعلام إذا كان الخادم يدعمها
+      // url = `/api/contents/type/${contentType}?department=${departmentFilter}`;
+    }
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error('فشل في جلب المحتوى حسب النوع');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('خطأ في جلب المحتوى حسب النوع:', error);
+    return []; // إرجاع مصفوفة فارغة في حالة الخطأ
   }
-  
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
 };
 
 export const getRecentContent = async (limitCount = 6): Promise<DocumentData[]> => {
-  const q = query(
-    collection(db, "contents"),
-    orderBy("createdAt", "desc"),
-    limit(limitCount)
-  );
-  
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+  try {
+    const response = await fetch(`/api/contents?limit=${limitCount}`);
+    
+    if (!response.ok) {
+      throw new Error('فشل في جلب المحتوى الحديث');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('خطأ في جلب المحتوى الحديث:', error);
+    return []; // إرجاع مصفوفة فارغة في حالة الخطأ
+  }
 };
 
 export { auth, db, storage };
