@@ -43,7 +43,11 @@ const contentTypeDetails: Record<string, { label: string, color: string }> = {
 export default function ContentCard({ content }: ContentCardProps) {
   // Format date to Arabic
   const formattedDate = format(
-    content.createdAt?.toDate() || new Date(),
+    content.createdAt && typeof content.createdAt.toDate === 'function'
+      ? content.createdAt.toDate()
+      : typeof content.createdAt === 'string'
+        ? new Date(content.createdAt)
+        : new Date(),
     "d MMMM yyyy",
     { locale: arEG }
   );

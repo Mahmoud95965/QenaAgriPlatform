@@ -444,7 +444,14 @@ export default function Profile() {
                 <div className="py-4 flex flex-col sm:flex-row">
                   <dt className="text-sm font-medium text-neutral-500 sm:w-40">تاريخ الانضمام</dt>
                   <dd className="mt-1 text-sm text-neutral-900 sm:mt-0 sm:ml-6">
-                    {userData.createdAt ? new Date(userData.createdAt.toDate()).toLocaleDateString('ar-EG') : "غير متاح"}
+                    {userData.createdAt ? 
+                      (typeof userData.createdAt === 'string' 
+                        ? new Date(userData.createdAt).toLocaleDateString('ar-EG') 
+                        : typeof userData.createdAt.toDate === 'function'
+                          ? new Date(userData.createdAt.toDate()).toLocaleDateString('ar-EG')
+                          : new Date(userData.createdAt).toLocaleDateString('ar-EG')
+                      ) 
+                      : "غير متاح"}
                   </dd>
                 </div>
                 <div className="py-4 flex flex-col sm:flex-row">

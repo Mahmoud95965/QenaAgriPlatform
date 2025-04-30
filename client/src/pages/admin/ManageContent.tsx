@@ -635,7 +635,7 @@ export default function ManageContent() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="">بدون قسم</SelectItem>
+                                  <SelectItem value="none">بدون قسم</SelectItem>
                                   <SelectItem value={Department.HORTICULTURE}>البساتين</SelectItem>
                                   <SelectItem value={Department.CROPS}>المحاصيل</SelectItem>
                                   <SelectItem value={Department.SOIL}>الأراضي والمياه</SelectItem>
@@ -852,7 +852,11 @@ export default function ManageContent() {
                               <TableCell>{content.authorName}</TableCell>
                               <TableCell>
                                 {format(
-                                  content.createdAt.toDate(),
+                                  content.createdAt && typeof content.createdAt.toDate === 'function'
+                                    ? content.createdAt.toDate()
+                                    : typeof content.createdAt === 'string'
+                                      ? new Date(content.createdAt)
+                                      : new Date(),
                                   "d MMM yyyy",
                                   { locale: arEG }
                                 )}
