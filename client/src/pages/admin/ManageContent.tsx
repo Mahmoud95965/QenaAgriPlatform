@@ -62,6 +62,7 @@ const contentFormSchema = z.object({
   authorName: z.string().min(2, "اسم المؤلف مطلوب"),
   studentYear: z.string().optional(),
   externalLink: z.string().url().optional().or(z.literal("")),
+  articleText: z.string().optional(),
 });
 
 type ContentFormValues = z.infer<typeof contentFormSchema>;
@@ -251,8 +252,38 @@ export default function ManageContent() {
       let fileUrl = "";
       let thumbnailUrl = "";
       
-      // تحميل الملف إلى الخادم إذا تم تقديمه
-      if (contentFile) {
+      // إذا كان المحتوى من نوع مقال ولديه نص مقال، نقوم بحفظ المقال النصي
+      if (values.contentType === ContentType.ARTICLE && values.articleText) {
+        try {
+          // إنشاء معرف فريد للمقال
+          const articleId = `article_${Date.now()}`;
+          
+          // حفظ نص المقال
+          const response = await fetch('/api/articles/text', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: articleId,
+              title: values.title,
+              content: values.articleText,
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error('فشل في حفظ نص المقال');
+          }
+          
+          const data = await response.json();
+          fileUrl = data.fileUrl;
+        } catch (articleError) {
+          console.error('خطأ في حفظ نص المقال:', articleError);
+          throw articleError;
+        }
+      } 
+      // تحميل الملف إلى الخادم إذا تم تقديمه (إذا كان هناك ملف PDF بالإضافة إلى المقال النصي أو كان نوع آخر من المحتوى)
+      else if (contentFile) {
         try {
           // إنشاء نموذج بيانات لإرسال الملف
           const formData = new FormData();
@@ -349,8 +380,48 @@ export default function ManageContent() {
       let fileUrl = selectedContent.fileUrl || "";
       let thumbnailUrl = selectedContent.thumbnailUrl || "";
       
+      // إذا كان المحتوى من نوع مقال وتم تعديل نص المقال
+      if (values.contentType === ContentType.ARTICLE && values.articleText) {
+        try {
+          // إذا كان المقال موجودًا بالفعل (نستخرج معرف المقال من رابط الملف)
+          let articleId = "";
+          
+          if (fileUrl && fileUrl.includes('/api/articles/')) {
+            // استخراج الجزء الخاص بالمعرف من الرابط
+            const urlParts = fileUrl.split('/');
+            const fileName = urlParts[urlParts.length - 1];
+            articleId = fileName.split('_')[0]; // نفترض أن المعرف هو الجزء الأول قبل الشرطة السفلية
+          } else {
+            // إنشاء معرف جديد إذا لم يكن هناك مقال موجود مسبقًا
+            articleId = `article_${Date.now()}`;
+          }
+          
+          // حفظ النص المعدل للمقال
+          const response = await fetch('/api/articles/text', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: articleId,
+              title: values.title,
+              content: values.articleText,
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error('فشل في حفظ نص المقال');
+          }
+          
+          const data = await response.json();
+          fileUrl = data.fileUrl;
+        } catch (articleError) {
+          console.error('خطأ في حفظ نص المقال:', articleError);
+          throw articleError;
+        }
+      } 
       // تحميل الملف الجديد إلى الخادم إذا تم تقديمه
-      if (contentFile) {
+      else if (contentFile) {
         try {
           // إنشاء نموذج بيانات لإرسال الملف
           const formData = new FormData();
@@ -464,10 +535,10 @@ export default function ManageContent() {
     }
   };
 
-  const editContent = (content: DocumentData) => {
+  const editContent = async (content: DocumentData) => {
     setSelectedContent(content);
     
-    // Populate form
+    // تعبئة النموذج بالبيانات الأساسية
     form.setValue("title", content.title);
     form.setValue("description", content.description);
     form.setValue("contentType", content.contentType);
@@ -475,6 +546,38 @@ export default function ManageContent() {
     form.setValue("authorName", content.authorName);
     form.setValue("studentYear", content.studentYear || "");
     form.setValue("externalLink", content.externalLink || "");
+    
+    // إذا كان المحتوى من نوع مقال وله رابط ملف يشير إلى مقال نصي، نقوم بتحميل نص المقال
+    if (content.contentType === ContentType.ARTICLE && content.fileUrl && content.fileUrl.includes('/api/articles/text/')) {
+      try {
+        // استخراج اسم الملف من الرابط
+        const urlParts = content.fileUrl.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        
+        // جلب محتوى المقال
+        const response = await fetch(`/api/articles/text/${fileName}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          form.setValue("articleText", data.content);
+          
+          // تنبيه المستخدم
+          toast({
+            title: "تم تحميل نص المقال",
+            description: "يمكنك الآن تحرير نص المقال",
+          });
+        } else {
+          console.error('فشل في تحميل نص المقال');
+          toast({
+            title: "تنبيه",
+            description: "لم نتمكن من تحميل نص المقال، يمكنك إدخال نص جديد",
+            variant: "warning",
+          });
+        }
+      } catch (error) {
+        console.error('خطأ في تحميل نص المقال:', error);
+      }
+    }
     
     setIsEditMode(true);
   };
@@ -631,6 +734,29 @@ export default function ManageContent() {
                           </FormItem>
                         )}
                       />
+                      
+                      {form.watch("contentType") === ContentType.ARTICLE && (
+                        <FormField
+                          control={form.control}
+                          name="articleText"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>نص المقال</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="أدخل نص المقال كاملاً هنا" 
+                                  className="min-h-64 font-normal text-base" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                يمكنك كتابة نص المقال كاملاً هنا، وسيتم تخزينه كملف نصي مع إمكانية تنزيله كملف PDF لاحقاً
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
