@@ -56,6 +56,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch content', error: (error as Error).message });
     }
   });
+  
+  // مسار الحصول على كل المحتويات (للإحصائيات)
+  app.get(`${apiPrefix}/contents`, async (req, res) => {
+    try {
+      const content = await storage.getAllContent();
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch contents', error: (error as Error).message });
+    }
+  });
 
   app.get(`${apiPrefix}/content/:id`, async (req, res) => {
     try {
