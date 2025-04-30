@@ -53,6 +53,7 @@ export const contents = pgTable("contents", {
   contentType: text("content_type").notNull().$type<ContentTypeType>(),
   department: text("department").$type<DepartmentType>(),
   fileUrl: text("file_url"),
+  articleTextPath: text("article_text_path"), // New field for storing article text file path
   externalLink: text("external_link"),
   authorId: integer("author_id").references(() => users.id, { onDelete: "cascade" }),
   authorName: text("author_name").notNull(),
