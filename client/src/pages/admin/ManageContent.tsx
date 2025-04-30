@@ -146,23 +146,27 @@ export default function ManageContent() {
       try {
         setIsLoading(true);
         
-        const contentRef = collection(db, "contents");
-        let q = query(contentRef, orderBy("createdAt", "desc"), limit(10));
+        // استخدام واجهة API للخادم بدلاً من Firebase
+        const response = await fetch('/api/contents');
         
-        const querySnapshot = await getDocs(q);
-        const contents: DocumentData[] = [];
+        if (!response.ok) {
+          throw new Error('فشل في جلب المحتوى');
+        }
         
-        querySnapshot.forEach((doc) => {
-          contents.push({ id: doc.id, ...doc.data() });
-        });
+        const contents = await response.json();
         
         setContentList(contents);
         setFilteredContent(contents);
         
-        if (querySnapshot.docs.length > 0) {
-          setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        } else {
+        // تحديث حالة التحميل للمزيد من المحتوى
+        if (contents.length < 10) {
           setHasMore(false);
+        } else {
+          setHasMore(true);
+          // استخدم معرف آخر عنصر كنقطة بداية للتحميل التالي
+          if (contents.length > 0) {
+            setLastVisible(contents[contents.length - 1].id);
+          }
         }
       } catch (error) {
         console.error("Error fetching content:", error);
@@ -217,21 +221,23 @@ export default function ManageContent() {
     try {
       setIsLoading(true);
       
-      const contentRef = collection(db, "contents");
-      let q = query(contentRef, orderBy("createdAt", "desc"), startAfter(lastVisible), limit(10));
+      // استخدام واجهة API للخادم لتحميل المزيد من المحتوى
+      const response = await fetch(`/api/contents?after=${lastVisible}`);
       
-      const querySnapshot = await getDocs(q);
-      const newContents: DocumentData[] = [];
+      if (!response.ok) {
+        throw new Error('فشل في جلب المزيد من المحتوى');
+      }
       
-      querySnapshot.forEach((doc) => {
-        newContents.push({ id: doc.id, ...doc.data() });
-      });
+      const newContents = await response.json();
       
       if (newContents.length === 0) {
         setHasMore(false);
       } else {
         setContentList([...contentList, ...newContents]);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        // استخدم معرف آخر عنصر جديد كنقطة بداية للتحميل التالي
+        if (newContents.length > 0) {
+          setLastVisible(newContents[newContents.length - 1].id);
+        }
       }
     } catch (error) {
       console.error("Error loading more content:", error);
@@ -344,20 +350,23 @@ export default function ManageContent() {
       setIsAddMode(false);
       
       // Refresh content list
-      const contentRef = collection(db, "contents");
-      const q = query(contentRef, orderBy("createdAt", "desc"), limit(10));
-      const querySnapshot = await getDocs(q);
+      const response = await fetch('/api/contents');
       
-      const contents: DocumentData[] = [];
-      querySnapshot.forEach((doc) => {
-        contents.push({ id: doc.id, ...doc.data() });
-      });
+      if (!response.ok) {
+        throw new Error('فشل في جلب المحتوى');
+      }
+      
+      const contents = await response.json();
       
       setContentList(contents);
       setFilteredContent(contents);
       
-      if (querySnapshot.docs.length > 0) {
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      // تحديث حالة التحميل للمزيد من المحتوى
+      if (contents.length > 0) {
+        setLastVisible(contents[contents.length - 1].id);
+        setHasMore(contents.length >= 10);
+      } else {
+        setHasMore(false);
       }
     } catch (error) {
       console.error("Error adding content:", error);
