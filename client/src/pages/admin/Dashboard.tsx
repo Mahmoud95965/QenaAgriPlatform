@@ -159,6 +159,18 @@ export default function AdminDashboard() {
                 </Link>
               </div>
             </div>
+            
+            <div className="pt-4 border-t border-neutral-200">
+              <h3 className="text-sm font-medium text-neutral-500 mb-2">إعدادات النظام</h3>
+              <div className="space-y-2">
+                <Link href="/admin/create-admin">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm cursor-pointer bg-yellow-50 border border-yellow-100">
+                    <PlusCircle className="w-4 h-4 ml-2 text-amber-600" />
+                    إنشاء حساب مسؤول
+                  </span>
+                </Link>
+              </div>
+            </div>
           </div>
           
           {/* Main content */}
