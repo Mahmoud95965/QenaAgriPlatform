@@ -20,12 +20,12 @@ const db = getFirestore(app);
 
 // بيانات المستخدم المسؤول
 const adminUser = {
-  email: "admin@agriculture-qena.edu.eg",
-  password: "Admin123456!",
-  displayName: "مسؤول النظام",
+  email: "mahmoud@gmail.com",
+  password: "Mahmoud159208#",
+  displayName: "محمود",
   role: UserRole.ADMIN,
   department: "other",
-  username: "admin",
+  username: "mahmoud",
   createdAt: new Date().toISOString()
 };
 
