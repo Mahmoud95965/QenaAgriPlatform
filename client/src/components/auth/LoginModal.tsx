@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { loginWithEmailPassword, loginWithGoogle } from "@/lib/firebase";
+import { loginWithEmailPassword, loginWithGoogle, db } from "@/lib/firebase";
+import { getDoc, doc, setDoc } from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,7 +42,40 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }: LoginModal
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await loginWithEmailPassword(values.email, values.password);
+      // تحقق ما إذا كان البريد الإلكتروني هو الخاص بالمسؤول (للاختبار فقط)
+      const isAdminEmail = values.email === "mahmoud@gmailcom";
+      
+      const userCredential = await loginWithEmailPassword(values.email, values.password);
+      
+      // تسجيل بيانات المستخدم للتصحيح
+      console.log("Login successful:", userCredential);
+      
+      // محاولة إنشاء مستخدم مسؤول إذا كان البريد الإلكتروني هو mahmoud@gmailcom
+      if (isAdminEmail) {
+        try {
+          // التحقق إذا كان المستخدم موجود بالفعل في Firestore
+          const user = userCredential.user;
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          
+          if (!userDoc.exists()) {
+            console.log("Creating admin user document for:", user.uid);
+            // إنشاء وثيقة مستخدم إذا لم تكن موجودة
+            await setDoc(doc(db, "users", user.uid), {
+              displayName: "Mahmoud Admin",
+              email: "mahmoud@gmailcom",
+              role: "admin",
+              username: "mahmoud",
+              createdAt: new Date()
+            });
+            console.log("Admin user document created successfully");
+          } else {
+            console.log("Admin user document already exists");
+          }
+        } catch (err) {
+          console.error("Error creating admin document:", err);
+        }
+      }
+      
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحبًا بعودتك إلى منصة كلية الزراعة بقنا",
