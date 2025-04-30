@@ -15,6 +15,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  // عدد المستخدمين
+  app.get(`${apiPrefix}/users/count`, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json({ count: users.length });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to count users', error: (error as Error).message });
+    }
+  });
+
   // User routes
   app.get(`${apiPrefix}/users`, async (req, res) => {
     try {

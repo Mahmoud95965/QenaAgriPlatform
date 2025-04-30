@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { db } from "@/lib/firebase";
-import { collection, getDocs, query, where, getCountFromServer } from "firebase/firestore";
-import { ContentType } from "@shared/schema";
+import { ContentType, type Content } from "@shared/schema";
 
 interface Stats {
   articles: number;
   books: number;
   projects: number;
   users: number;
+}
+
+// واجهة للمحتوى المستلم من الخادم
+interface ContentResponse {
+  id: number;
+  contentType: string;
+  title: string;
+  description: string;
+  [key: string]: any;
 }
 
 export default function StatisticsSection() {
@@ -22,36 +29,43 @@ export default function StatisticsSection() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Count articles
-        const articlesQuery = query(collection(db, "contents"), where("contentType", "==", ContentType.ARTICLE));
-        const articlesSnapshot = await getCountFromServer(articlesQuery);
+        // جلب إحصائيات المحتوى من الخادم
+        const contentsResponse = await fetch('/api/contents');
         
-        // Count books
-        const booksQuery = query(collection(db, "contents"), where("contentType", "==", ContentType.EBOOK));
-        const booksSnapshot = await getCountFromServer(booksQuery);
+        if (!contentsResponse.ok) {
+          throw new Error('فشل في جلب المحتوى');
+        }
         
-        // Count projects
-        const projectsQuery = query(collection(db, "contents"), where("contentType", "==", ContentType.PROJECT));
-        const projectsSnapshot = await getCountFromServer(projectsQuery);
+        const contents: ContentResponse[] = await contentsResponse.json();
         
-        // Count users
-        const usersQuery = collection(db, "users");
-        const usersSnapshot = await getCountFromServer(usersQuery);
-
+        // حساب الإحصائيات من البيانات المستلمة
+        const articlesCount = contents.filter(item => item.contentType === ContentType.ARTICLE).length;
+        const booksCount = contents.filter(item => item.contentType === ContentType.EBOOK).length;
+        const projectsCount = contents.filter(item => item.contentType === ContentType.PROJECT).length;
+        
+        // جلب إحصائيات المستخدمين
+        const usersResponse = await fetch('/api/users/count');
+        let usersCount = 0;
+        
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json();
+          usersCount = usersData.count || 0;
+        }
+        
         setStats({
-          articles: articlesSnapshot.data().count,
-          books: booksSnapshot.data().count,
-          projects: projectsSnapshot.data().count,
-          users: usersSnapshot.data().count,
+          articles: articlesCount,
+          books: booksCount,
+          projects: projectsCount,
+          users: usersCount,
         });
       } catch (error) {
         console.error("Error fetching statistics:", error);
-        // Set default values in case of error
+        // استخدام عدد تقريبي في حالة الخطأ
         setStats({
-          articles: 320,
-          books: 150,
-          projects: 75,
-          users: 1200,
+          articles: 0,
+          books: 0,
+          projects: 0,
+          users: 0,
         });
       } finally {
         setIsLoading(false);
