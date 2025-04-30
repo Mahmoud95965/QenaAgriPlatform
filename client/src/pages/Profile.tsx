@@ -333,7 +333,7 @@ export default function Profile() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="">بدون قسم</SelectItem>
+                                  <SelectItem value="none">بدون قسم</SelectItem>
                                   <SelectItem value={Department.HORTICULTURE}>البساتين</SelectItem>
                                   <SelectItem value={Department.CROPS}>المحاصيل</SelectItem>
                                   <SelectItem value={Department.SOIL}>الأراضي والمياه</SelectItem>
