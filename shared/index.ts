@@ -1,6 +1,5 @@
-import * as schema from './schema';
+export * from './schema';
 
-// Temporary stub interfaces to make the existing code work
 export interface IStorage {
   getAllUsers: () => Promise<any[]>;
   getUser: (id: number) => Promise<any | undefined>;
@@ -11,5 +10,3 @@ export interface IStorage {
   getContentByType: (contentType: string) => Promise<any[]>;
   getContentByDepartment: (department: string) => Promise<any[]>;
 }
-
-export default schema;

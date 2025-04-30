@@ -1,6 +1,24 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import fs from "fs";
+import path from "path";
+import { ContentType } from "@shared/schema";
+
+// دالة للتأكد من وجود مجلدات التخزين
+function ensureUploadDirectories() {
+  const uploadDir = path.join('.', 'uploads');
+  const articleDir = path.join(uploadDir, 'articles');
+  const ebookDir = path.join(uploadDir, 'ebooks');
+  const projectDir = path.join(uploadDir, 'projects');
+  
+  [uploadDir, articleDir, ebookDir, projectDir].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      log(`Created directory: ${dir}`);
+    }
+  });
+}
 
 const app = express();
 app.use(express.json());
