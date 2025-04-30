@@ -165,7 +165,42 @@ export const createUsersFromExcel = async (file: File): Promise<{ success: Excel
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json<ExcelUser>(worksheet);
+        
+        // استخراج البيانات من ملف الإكسل
+        const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        // تحديد نوع الملف وترتيب الأعمدة
+        let jsonData: ExcelUser[] = [];
+        const defaultPassword = "Password123!"; // كلمة مرور افتراضية للطلاب
+        
+        // تفقد ما إذا كان الملف هو ملف إيميلات الطلاب
+        const isStudentEmailFormat = rawData.length > 0 && 
+                                   rawData[0].length >= 1 && 
+                                   typeof rawData[0][0] === 'string' && 
+                                   rawData[0][0].includes('@');
+        
+        if (isStudentEmailFormat) {
+          // تحويل بيانات الإيميلات إلى الصيغة المطلوبة
+          jsonData = rawData
+            .filter(row => row.length > 0 && typeof row[0] === 'string' && row[0].includes('@'))
+            .map(row => {
+              const email = String(row[0]).trim();
+              const username = email.split('@')[0];
+              return {
+                name: username, // استخدام اسم المستخدم من الإيميل
+                email: email,
+                password: defaultPassword,
+                role: UserRole.STUDENT,
+                department: "قسم عام", // قسم افتراضي للطلاب الجدد
+                studentId: username // استخدام اسم المستخدم كمعرف طالب مؤقت
+              };
+          });
+        } else {
+          // استخدام التنسيق القياسي لملف الإكسل
+          jsonData = XLSX.utils.sheet_to_json<ExcelUser>(worksheet);
+        }
+        
+        console.log("تم تحميل البيانات من الملف:", jsonData.length, "مستخدم");
         
         for (const user of jsonData) {
           try {
@@ -178,12 +213,14 @@ export const createUsersFromExcel = async (file: File): Promise<{ success: Excel
             });
             result.success.push(user);
           } catch (error) {
+            console.error("فشل في إنشاء المستخدم:", user.email, error);
             result.failed.push(user);
           }
         }
         
         resolve(result);
       } catch (error) {
+        console.error("خطأ في معالجة ملف الإكسل:", error);
         reject(error);
       }
     };
