@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { X } from "lucide-react";
+import GoogleProfileModal from "./GoogleProfileModal";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "يرجى إدخال بريد إلكتروني صحيح" }),
@@ -31,6 +32,8 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose, onOpenSignup }: LoginModalProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [googleUser, setGoogleUser] = useState<any>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
