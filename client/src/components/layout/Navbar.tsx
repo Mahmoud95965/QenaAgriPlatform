@@ -58,41 +58,41 @@ export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
           {/* Logo and title */}
           <div className="flex items-center space-x-4 space-x-reverse">
             <Link href="/">
-              <a className="flex items-center">
+              <div className="flex items-center cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 rounded-full text-primary" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
                 <h1 className="text-xl font-bold text-primary-dark hidden md:block">كلية الزراعة بقنا</h1>
-              </a>
+              </div>
             </Link>
           </div>
           
           {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-6 space-x-reverse">
             <Link href="/">
-              <a className={`text-${location === "/" ? "primary font-medium py-2 border-b-2 border-primary" : "neutral-600 hover:text-primary font-medium py-2 border-b-2 border-transparent hover:border-primary transition-colors"}`}>
+              <span className={`text-${location === "/" ? "primary" : "neutral-600"} font-medium py-2 border-b-2 ${location === "/" ? "border-primary" : "border-transparent hover:border-primary"} hover:text-primary transition-colors cursor-pointer`}>
                 الرئيسية
-              </a>
+              </span>
             </Link>
             <Link href="/articles">
-              <a className={`text-${location === "/articles" ? "primary font-medium py-2 border-b-2 border-primary" : "neutral-600 hover:text-primary font-medium py-2 border-b-2 border-transparent hover:border-primary transition-colors"}`}>
+              <span className={`text-${location === "/articles" ? "primary" : "neutral-600"} font-medium py-2 border-b-2 ${location === "/articles" ? "border-primary" : "border-transparent hover:border-primary"} hover:text-primary transition-colors cursor-pointer`}>
                 المقالات العلمية
-              </a>
+              </span>
             </Link>
             <Link href="/projects">
-              <a className={`text-${location === "/projects" ? "primary font-medium py-2 border-b-2 border-primary" : "neutral-600 hover:text-primary font-medium py-2 border-b-2 border-transparent hover:border-primary transition-colors"}`}>
+              <span className={`text-${location === "/projects" ? "primary" : "neutral-600"} font-medium py-2 border-b-2 ${location === "/projects" ? "border-primary" : "border-transparent hover:border-primary"} hover:text-primary transition-colors cursor-pointer`}>
                 مشاريع التخرج
-              </a>
+              </span>
             </Link>
             <Link href="/ebooks">
-              <a className={`text-${location === "/ebooks" ? "primary font-medium py-2 border-b-2 border-primary" : "neutral-600 hover:text-primary font-medium py-2 border-b-2 border-transparent hover:border-primary transition-colors"}`}>
+              <span className={`text-${location === "/ebooks" ? "primary" : "neutral-600"} font-medium py-2 border-b-2 ${location === "/ebooks" ? "border-primary" : "border-transparent hover:border-primary"} hover:text-primary transition-colors cursor-pointer`}>
                 المكتبة الإلكترونية
-              </a>
+              </span>
             </Link>
             <Link href="/departments">
-              <a className={`text-${location === "/departments" ? "primary font-medium py-2 border-b-2 border-primary" : "neutral-600 hover:text-primary font-medium py-2 border-b-2 border-transparent hover:border-primary transition-colors"}`}>
+              <span className={`text-${location === "/departments" ? "primary" : "neutral-600"} font-medium py-2 border-b-2 ${location === "/departments" ? "border-primary" : "border-transparent hover:border-primary"} hover:text-primary transition-colors cursor-pointer`}>
                 الأقسام
-              </a>
+              </span>
             </Link>
           </nav>
           
@@ -167,44 +167,44 @@ export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
         <div className="md:hidden bg-white border-t border-neutral-200 p-4">
           <nav className="grid gap-y-2">
             <Link href="/">
-              <a className={`flex items-center px-4 py-2 text-base font-medium ${location === "/" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors`}>
+              <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
                 <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 الرئيسية
-              </a>
+              </div>
             </Link>
             <Link href="/articles">
-              <a className={`flex items-center px-4 py-2 text-base font-medium ${location === "/articles" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors`}>
+              <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/articles" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
                 <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
                 المقالات العلمية
-              </a>
+              </div>
             </Link>
             <Link href="/projects">
-              <a className={`flex items-center px-4 py-2 text-base font-medium ${location === "/projects" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors`}>
+              <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/projects" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
                 <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 مشاريع التخرج
-              </a>
+              </div>
             </Link>
             <Link href="/ebooks">
-              <a className={`flex items-center px-4 py-2 text-base font-medium ${location === "/ebooks" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors`}>
+              <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/ebooks" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
                 <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 المكتبة الإلكترونية
-              </a>
+              </div>
             </Link>
             <Link href="/departments">
-              <a className={`flex items-center px-4 py-2 text-base font-medium ${location === "/departments" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors`}>
+              <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/departments" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
                 <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
                 الأقسام
-              </a>
+              </div>
             </Link>
             
             {!user && (
