@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { auth, getUserByUid } from "@/lib/firebase";
+import { auth, getUserByUid, createUserDocument } from "@/lib/firebase";
 import { UserRole } from "@shared/schema";
 import { DocumentData } from "firebase/firestore";
 
@@ -41,10 +41,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       if (firebaseUser) {
         try {
+          // محاولة الحصول على وثيقة المستخدم
           const userDoc = await getUserByUid(firebaseUser.uid);
-          setUserData(userDoc);
+          
+          if (userDoc) {
+            // إذا تم العثور على وثيقة المستخدم، استخدمها
+            setUserData(userDoc);
+            console.log("Found existing user document:", userDoc);
+          } else {
+            console.log("No user document found, creating new document for user:", firebaseUser.uid);
+            
+            // تحقق إذا كان المستخدم هو المسؤول (للتطوير فقط)
+            const isAdminEmail = firebaseUser.email === "mahmoud@gmailcom";
+            
+            // استخدام الوظيفة الجديدة لإنشاء وثيقة المستخدم
+            const role = isAdminEmail ? UserRole.ADMIN : UserRole.STUDENT;
+            const newUserData = await createUserDocument(firebaseUser, role);
+            console.log("Created new user document:", newUserData);
+            
+            // تعيين وثيقة المستخدم الجديدة
+            setUserData(newUserData);
+          }
         } catch (error) {
-          console.error("Error fetching user data:", error);
+          console.error("Error handling user document:", error);
           setUserData(null);
         }
       } else {
