@@ -518,7 +518,11 @@ export default function ManageUsers() {
                               </TableCell>
                               <TableCell>
                                 {user.createdAt ? format(
-                                  user.createdAt.toDate(),
+                                  typeof user.createdAt === 'string' 
+                                    ? new Date(user.createdAt)
+                                    : typeof user.createdAt.toDate === 'function'
+                                      ? user.createdAt.toDate() 
+                                      : new Date(),
                                   "d MMM yyyy",
                                   { locale: arEG }
                                 ) : "—"}
