@@ -1,4 +1,5 @@
-import { users, contents, type User, type Content, type InsertUser } from "@shared/schema";
+import { users, contents, type User, type Content, type InsertUser, 
+  UserRole, Department, type UserRoleType, type DepartmentType } from "@shared/schema";
 import { IStorage } from "@shared/index";
 
 export class MemStorage implements IStorage {
@@ -28,7 +29,18 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
-    const user: User = { ...insertUser, id };
+    const user = {
+      id,
+      uid: insertUser.uid,
+      email: insertUser.email,
+      username: insertUser.username,
+      displayName: insertUser.displayName,
+      role: insertUser.role as UserRoleType,
+      department: insertUser.department as DepartmentType || null,
+      studentId: insertUser.studentId || null,
+      profilePicture: insertUser.profilePicture || null,
+      createdAt: new Date()
+    } as User;
     this.users.set(id, user);
     return user;
   }
