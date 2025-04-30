@@ -82,6 +82,29 @@ export const getUserByUid = async (uid: string): Promise<DocumentData | null> =>
   }
 };
 
+export const createUserDocument = async (user: any, role: string = UserRole.STUDENT): Promise<DocumentData> => {
+  try {
+    console.log("Creating user document for:", user.uid);
+    
+    const userData = {
+      displayName: user.displayName || "User",
+      email: user.email,
+      username: user.email?.split('@')[0] || "user",
+      role: role,
+      createdAt: new Date(),
+      id: user.uid
+    };
+    
+    await setDoc(doc(db, "users", user.uid), userData);
+    console.log("User document created successfully:", userData);
+    
+    return userData;
+  } catch (error) {
+    console.error("Error creating user document:", error);
+    throw error;
+  }
+};
+
 export const updateUserRole = async (uid: string, role: string): Promise<void> => {
   await updateDoc(doc(db, "users", uid), { role });
 };
