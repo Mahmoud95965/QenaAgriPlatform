@@ -251,14 +251,34 @@ export default function ManageContent() {
       let fileUrl = "";
       let thumbnailUrl = "";
       
-      // Upload file if provided
+      // تحميل الملف إلى الخادم إذا تم تقديمه
       if (contentFile) {
-        const storageRef = ref(storage, `content/${values.contentType}/${Date.now()}_${contentFile.name}`);
-        await uploadBytes(storageRef, contentFile);
-        fileUrl = await getDownloadURL(storageRef);
+        try {
+          // إنشاء نموذج بيانات لإرسال الملف
+          const formData = new FormData();
+          formData.append('file', contentFile);
+          formData.append('contentType', values.contentType);
+          formData.append('title', values.title);
+          
+          // إرسال الملف إلى الخادم
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error('فشل في رفع الملف');
+          }
+          
+          const data = await response.json();
+          fileUrl = data.fileUrl;
+        } catch (uploadError) {
+          console.error('خطأ في رفع الملف:', uploadError);
+          throw uploadError;
+        }
       }
       
-      // Upload thumbnail if provided
+      // تحميل الصورة المصغرة إذا تم تقديمها (لا زلنا نستخدم Firebase Storage للصور المصغرة)
       if (thumbnailFile) {
         const thumbnailRef = ref(storage, `thumbnails/${values.contentType}/${Date.now()}_${thumbnailFile.name}`);
         await uploadBytes(thumbnailRef, thumbnailFile);
@@ -329,14 +349,34 @@ export default function ManageContent() {
       let fileUrl = selectedContent.fileUrl || "";
       let thumbnailUrl = selectedContent.thumbnailUrl || "";
       
-      // Upload new file if provided
+      // تحميل الملف الجديد إلى الخادم إذا تم تقديمه
       if (contentFile) {
-        const storageRef = ref(storage, `content/${values.contentType}/${Date.now()}_${contentFile.name}`);
-        await uploadBytes(storageRef, contentFile);
-        fileUrl = await getDownloadURL(storageRef);
+        try {
+          // إنشاء نموذج بيانات لإرسال الملف
+          const formData = new FormData();
+          formData.append('file', contentFile);
+          formData.append('contentType', values.contentType);
+          formData.append('title', values.title);
+          
+          // إرسال الملف إلى الخادم
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error('فشل في رفع الملف');
+          }
+          
+          const data = await response.json();
+          fileUrl = data.fileUrl;
+        } catch (uploadError) {
+          console.error('خطأ في رفع الملف:', uploadError);
+          throw uploadError;
+        }
       }
       
-      // Upload new thumbnail if provided
+      // تحميل الصورة المصغرة الجديدة إذا تم تقديمها (لا زلنا نستخدم Firebase Storage للصور المصغرة)
       if (thumbnailFile) {
         const thumbnailRef = ref(storage, `thumbnails/${values.contentType}/${Date.now()}_${thumbnailFile.name}`);
         await uploadBytes(thumbnailRef, thumbnailFile);
