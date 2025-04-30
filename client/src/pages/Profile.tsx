@@ -58,7 +58,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Department } from "@shared/schema";
-import { Upload, User, BookOpen, GraduationCap, FileText } from "lucide-react";
+import { Upload, User, BookOpen, GraduationCap, FileText, LayoutDashboard, Users } from "lucide-react";
 
 // Profile form schema
 const profileFormSchema = z.object({
@@ -323,12 +323,12 @@ export default function Profile() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="none">بدون قسم</SelectItem>
-                                  <SelectItem value="horticulture">البساتين</SelectItem>
-                                  <SelectItem value="crops">المحاصيل</SelectItem>
-                                  <SelectItem value="soil">الأراضي والمياه</SelectItem>
-                                  <SelectItem value="protection">وقاية النبات</SelectItem>
-                                  <SelectItem value="other">أخرى</SelectItem>
+                                  <SelectItem value="">بدون قسم</SelectItem>
+                                  <SelectItem value={Department.HORTICULTURE}>البساتين</SelectItem>
+                                  <SelectItem value={Department.CROPS}>المحاصيل</SelectItem>
+                                  <SelectItem value={Department.SOIL}>الأراضي والمياه</SelectItem>
+                                  <SelectItem value={Department.PROTECTION}>وقاية النبات</SelectItem>
+                                  <SelectItem value={Department.OTHER}>أخرى</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -456,6 +456,43 @@ export default function Profile() {
                     <dt className="text-sm font-medium text-neutral-500 sm:w-40">الرقم الجامعي</dt>
                     <dd className="mt-1 text-sm text-neutral-900 sm:mt-0 sm:ml-6">
                       {userData.studentId}
+                    </dd>
+                  </div>
+                )}
+                
+                {/* Admin Dashboard Access */}
+                {isAdmin && (
+                  <div className="py-4">
+                    <dt className="text-sm font-medium text-neutral-500">لوحة تحكم المسؤول</dt>
+                    <dd className="mt-2">
+                      <div className="space-y-2">
+                        <Link href="/admin/dashboard">
+                          <div className="cursor-pointer">
+                            <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
+                              <LayoutDashboard className="h-4 w-4 ml-2" />
+                              الذهاب إلى لوحة التحكم
+                            </Button>
+                          </div>
+                        </Link>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link href="/admin/users">
+                            <div className="cursor-pointer">
+                              <Button variant="outline" size="sm" className="w-full">
+                                <Users className="h-3 w-3 ml-1" />
+                                إدارة المستخدمين
+                              </Button>
+                            </div>
+                          </Link>
+                          <Link href="/admin/content">
+                            <div className="cursor-pointer">
+                              <Button variant="outline" size="sm" className="w-full">
+                                <FileText className="h-3 w-3 ml-1" />
+                                إدارة المحتوى
+                              </Button>
+                            </div>
+                          </Link>
+                        </div>
+                      </div>
                     </dd>
                   </div>
                 )}
