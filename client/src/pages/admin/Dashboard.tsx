@@ -224,6 +224,7 @@ export default function AdminDashboard() {
               <TabsList className="mb-4">
                 <TabsTrigger value="users">المستخدمين</TabsTrigger>
                 <TabsTrigger value="content">المحتوى</TabsTrigger>
+                <TabsTrigger value="site-info">معلومات الموقع</TabsTrigger>
               </TabsList>
               
               <TabsContent value="users">
@@ -298,6 +299,88 @@ export default function AdminDashboard() {
                         </div>
                       </Link>
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="site-info">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>معلومات عامة عن الموقع</CardTitle>
+                    <CardDescription>بيانات إحصائية عن منصة كلية الزراعة</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="flex justify-center py-6">
+                        <p>جارٍ تحميل البيانات...</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-primary/10 p-6 rounded-lg">
+                            <h3 className="text-lg font-bold text-primary mb-4">إحصائيات عامة</h3>
+                            <div className="space-y-3">
+                              <div className="flex justify-between">
+                                <span className="text-neutral-600">إجمالي المستخدمين:</span>
+                                <span className="font-bold">{stats.users.total}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-neutral-600">إجمالي المحتوى:</span>
+                                <span className="font-bold">{stats.content.total}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-neutral-600">النسبة المئوية للطلاب:</span>
+                                <span className="font-bold">
+                                  {stats.users.total > 0
+                                    ? Math.round((stats.users.students / stats.users.total) * 100)
+                                    : 0}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-green-50 p-6 rounded-lg">
+                            <h3 className="text-lg font-bold text-green-700 mb-4">معلومات الموقع</h3>
+                            <div className="space-y-3">
+                              <div className="flex justify-between">
+                                <span className="text-neutral-600">اسم الموقع:</span>
+                                <span className="font-bold">منصة كلية الزراعة بقنا</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-neutral-600">الإصدار الحالي:</span>
+                                <span className="font-bold">1.0.0</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-neutral-600">آخر تحديث:</span>
+                                <span className="font-bold">{new Date().toLocaleDateString('ar-EG')}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-blue-50 p-6 rounded-lg">
+                          <h3 className="text-lg font-bold text-blue-700 mb-4">توزيع المستخدمين حسب الأقسام</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-white p-3 rounded shadow-sm text-center">
+                              <p className="text-neutral-500 text-sm mb-1">البساتين</p>
+                              <p className="font-bold">-</p>
+                            </div>
+                            <div className="bg-white p-3 rounded shadow-sm text-center">
+                              <p className="text-neutral-500 text-sm mb-1">المحاصيل</p>
+                              <p className="font-bold">-</p>
+                            </div>
+                            <div className="bg-white p-3 rounded shadow-sm text-center">
+                              <p className="text-neutral-500 text-sm mb-1">الأراضي والمياه</p>
+                              <p className="font-bold">-</p>
+                            </div>
+                            <div className="bg-white p-3 rounded shadow-sm text-center">
+                              <p className="text-neutral-500 text-sm mb-1">وقاية النبات</p>
+                              <p className="font-bold">-</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
