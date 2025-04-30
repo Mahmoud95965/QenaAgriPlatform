@@ -17,12 +17,12 @@ export default function FeaturesSection() {
             <h3 className="text-xl font-bold text-neutral-800 mb-2">المكتبة الرقمية</h3>
             <p className="text-neutral-600 mb-4">مجموعة متنوعة من الكتب والمقالات العلمية في مختلف مجالات العلوم الزراعية.</p>
             <Link href="/ebooks">
-              <a className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors cursor-pointer">
                 استكشف المكتبة
                 <svg className="ml-1 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
           
@@ -34,12 +34,12 @@ export default function FeaturesSection() {
             <h3 className="text-xl font-bold text-neutral-800 mb-2">مشاريع التخرج</h3>
             <p className="text-neutral-600 mb-4">مستودع لمشاريع تخرج الطلاب السابقة للاطلاع والاستفادة منها في البحث العلمي.</p>
             <Link href="/projects">
-              <a className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors cursor-pointer">
                 تصفح المشاريع
                 <svg className="ml-1 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
           
@@ -51,12 +51,12 @@ export default function FeaturesSection() {
             <h3 className="text-xl font-bold text-neutral-800 mb-2">المقالات العلمية</h3>
             <p className="text-neutral-600 mb-4">أحدث المقالات والأبحاث العلمية في مجال العلوم الزراعية للاطلاع والاستفادة.</p>
             <Link href="/articles">
-              <a className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors cursor-pointer">
                 قراءة المقالات
                 <svg className="ml-1 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
         </div>
