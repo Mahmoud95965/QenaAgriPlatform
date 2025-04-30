@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import facultyCampusImage from "@/assets/faculty_campus.jpeg";
 
 export default function HomeHero() {
   return (
@@ -27,9 +28,9 @@ export default function HomeHero() {
           </div>
           <div className="md:w-1/2">
             <img 
-              src="https://images.unsplash.com/photo-1587825045005-c11cb55d991b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80" 
+              src={facultyCampusImage} 
               className="w-full max-w-md mx-auto rounded-xl shadow-lg" 
-              alt="صورة لحرم كلية الزراعة"
+              alt="صورة لحرم كلية الزراعة بقنا"
             />
           </div>
         </div>
