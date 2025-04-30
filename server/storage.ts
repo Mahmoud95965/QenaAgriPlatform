@@ -234,28 +234,27 @@ export class DatabaseStorage implements IStorage {
       return null;
     }
     
-    // Prepare the update ensuring proper types
-    const updateData: any = { updatedAt: new Date() };
+    // Use SQL template tag to create a safe SQL query with parameters
+    const result = await db.execute(sql`
+      UPDATE contents
+      SET
+        updated_at = NOW(),
+        title = CASE WHEN ${contentUpdate.title !== undefined} THEN ${contentUpdate.title || null} ELSE title END,
+        description = CASE WHEN ${contentUpdate.description !== undefined} THEN ${contentUpdate.description || null} ELSE description END,
+        content_type = CASE WHEN ${contentUpdate.contentType !== undefined} THEN ${contentUpdate.contentType || null} ELSE content_type END,
+        department = CASE WHEN ${contentUpdate.department !== undefined} THEN ${contentUpdate.department || null} ELSE department END,
+        file_url = CASE WHEN ${contentUpdate.fileUrl !== undefined} THEN ${contentUpdate.fileUrl || null} ELSE file_url END,
+        article_text_path = CASE WHEN ${contentUpdate.articleTextPath !== undefined} THEN ${contentUpdate.articleTextPath || null} ELSE article_text_path END,
+        external_link = CASE WHEN ${contentUpdate.externalLink !== undefined} THEN ${contentUpdate.externalLink || null} ELSE external_link END,
+        author_id = CASE WHEN ${contentUpdate.authorId !== undefined} THEN ${contentUpdate.authorId || null} ELSE author_id END,
+        author_name = CASE WHEN ${contentUpdate.authorName !== undefined} THEN ${contentUpdate.authorName || null} ELSE author_name END,
+        student_year = CASE WHEN ${contentUpdate.studentYear !== undefined} THEN ${contentUpdate.studentYear || null} ELSE student_year END,
+        thumbnail_url = CASE WHEN ${contentUpdate.thumbnailUrl !== undefined} THEN ${contentUpdate.thumbnailUrl || null} ELSE thumbnail_url END
+      WHERE id = ${id}
+      RETURNING *
+    `);
     
-    if (contentUpdate.title !== undefined) updateData.title = contentUpdate.title;
-    if (contentUpdate.description !== undefined) updateData.description = contentUpdate.description;
-    if (contentUpdate.contentType !== undefined) updateData.contentType = contentUpdate.contentType;
-    if (contentUpdate.department !== undefined) updateData.department = contentUpdate.department;
-    if (contentUpdate.fileUrl !== undefined) updateData.fileUrl = contentUpdate.fileUrl;
-    if (contentUpdate.articleTextPath !== undefined) updateData.articleTextPath = contentUpdate.articleTextPath;
-    if (contentUpdate.externalLink !== undefined) updateData.externalLink = contentUpdate.externalLink;
-    if (contentUpdate.authorId !== undefined) updateData.authorId = contentUpdate.authorId;
-    if (contentUpdate.authorName !== undefined) updateData.authorName = contentUpdate.authorName;
-    if (contentUpdate.studentYear !== undefined) updateData.studentYear = contentUpdate.studentYear;
-    if (contentUpdate.thumbnailUrl !== undefined) updateData.thumbnailUrl = contentUpdate.thumbnailUrl;
-    
-    const [updatedContent] = await db
-      .update(contents)
-      .set(updateData)
-      .where(eq(contents.id, id))
-      .returning();
-    
-    return updatedContent || null;
+    return result.rows.length > 0 ? result.rows[0] as Content : null;
   }
 
   async deleteContent(id: number): Promise<boolean> {
