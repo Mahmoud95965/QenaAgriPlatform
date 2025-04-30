@@ -18,10 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { updateUserRole } from "@/lib/firebase";
+import { updateUserRole, createUserDocument } from "@/lib/firebase";
 import { UserRole } from "@shared/schema";
 import { updateProfile } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface GoogleProfileModalProps {
@@ -70,11 +70,19 @@ export default function GoogleProfileModal({ isOpen, onClose, user }: GoogleProf
         // تحديث الملف الشخصي في Firebase Authentication
         await updateProfile(user, { displayName: name });
         
-        // تحديث معلومات المستخدم في Firestore
-        await updateDoc(doc(db, "users", user.uid), {
-          displayName: name,
-          role: role,
-        });
+        // التحقق مما إذا كان المستخدم موجودًا بالفعل في Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if (!userDoc.exists()) {
+          // إنشاء مستخدم جديد في Firestore
+          await createUserDocument(user, role);
+        } else {
+          // تحديث معلومات المستخدم في Firestore إذا كان موجودًا
+          await updateDoc(doc(db, "users", user.uid), {
+            displayName: name,
+            role: role,
+          });
+        }
       }
       
       toast({
