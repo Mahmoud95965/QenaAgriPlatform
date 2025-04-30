@@ -52,7 +52,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             console.log("No user document found, creating new document for user:", firebaseUser.uid);
             
             // تحقق إذا كان المستخدم هو المسؤول (للتطوير فقط)
-            const isAdminEmail = firebaseUser.email === "mahmoud@gmailcom";
+            const isAdminEmail = firebaseUser.email === "mahmoud@gmail.com";
             
             // استخدام الوظيفة الجديدة لإنشاء وثيقة المستخدم
             const role = isAdminEmail ? UserRole.ADMIN : UserRole.STUDENT;
