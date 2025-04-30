@@ -35,7 +35,7 @@ export default function EBooks() {
     let filtered = [...ebooks];
     
     // Apply department filter
-    if (departmentFilter) {
+    if (departmentFilter && departmentFilter !== 'all') {
       filtered = filtered.filter(ebook => ebook.department === departmentFilter);
     }
     
@@ -84,7 +84,7 @@ export default function EBooks() {
               <SelectValue placeholder="جميع الأقسام" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">جميع الأقسام</SelectItem>
+              <SelectItem value="all">جميع الأقسام</SelectItem>
               {Object.entries(departmentNames).map(([value, label]) => (
                 <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}
