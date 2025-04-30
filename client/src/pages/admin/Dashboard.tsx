@@ -13,7 +13,8 @@ import {
   FileText, 
   PlusCircle, 
   BarChart3,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, getCountFromServer, query, where } from "firebase/firestore";

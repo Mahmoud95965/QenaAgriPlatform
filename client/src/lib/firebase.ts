@@ -22,6 +22,13 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
+// التحقق من رمز الإثبات للمسؤول
+export const verifyAdminCode = (code: string): boolean => {
+  // رمز الإثبات للمسؤول
+  const ADMIN_SECRET_CODE = "Agri159208#";
+  return code === ADMIN_SECRET_CODE;
+};
+
 // Authentication functions
 export const loginWithEmailPassword = (email: string, password: string): Promise<UserCredential> => {
   return signInWithEmailAndPassword(auth, email, password);
