@@ -11,8 +11,8 @@ export default function GraduationProjects() {
   const [projects, setProjects] = useState<DocumentData[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<DocumentData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [departmentFilter, setDepartmentFilter] = useState<string>("");
-  const [yearFilter, setYearFilter] = useState<string>("");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
@@ -35,12 +35,12 @@ export default function GraduationProjects() {
     let filtered = [...projects];
     
     // Apply department filter
-    if (departmentFilter) {
+    if (departmentFilter && departmentFilter !== "all") {
       filtered = filtered.filter(project => project.department === departmentFilter);
     }
     
     // Apply year filter
-    if (yearFilter) {
+    if (yearFilter && yearFilter !== "all") {
       filtered = filtered.filter(project => project.studentYear === yearFilter);
     }
     
@@ -95,7 +95,7 @@ export default function GraduationProjects() {
               <SelectValue placeholder="جميع الأقسام" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">جميع الأقسام</SelectItem>
+              <SelectItem value="all">جميع الأقسام</SelectItem>
               {Object.entries(departmentNames).map(([value, label]) => (
                 <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}
@@ -107,7 +107,7 @@ export default function GraduationProjects() {
               <SelectValue placeholder="جميع السنوات" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">جميع السنوات</SelectItem>
+              <SelectItem value="all">جميع السنوات</SelectItem>
               {getUniqueYears().map(year => (
                 <SelectItem key={year} value={year}>{year}</SelectItem>
               ))}
