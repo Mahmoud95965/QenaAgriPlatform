@@ -116,22 +116,22 @@ export default function AdminDashboard() {
               <h2 className="text-lg font-bold text-neutral-800 mb-4">لوحة التحكم</h2>
               <nav className="space-y-2">
                 <Link href="/admin/dashboard">
-                  <a className="flex items-center p-2 text-neutral-700 rounded-md bg-neutral-100 font-medium">
+                  <span className="flex items-center p-2 text-neutral-700 rounded-md bg-neutral-100 font-medium cursor-pointer">
                     <LayoutDashboard className="w-5 h-5 ml-2" />
                     الرئيسية
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/admin/content">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors cursor-pointer">
                     <File className="w-5 h-5 ml-2" />
                     إدارة المحتوى
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/admin/users">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors cursor-pointer">
                     <Users className="w-5 h-5 ml-2" />
                     إدارة المستخدمين
-                  </a>
+                  </span>
                 </Link>
               </nav>
             </div>
@@ -140,22 +140,22 @@ export default function AdminDashboard() {
               <h3 className="text-sm font-medium text-neutral-500 mb-2">إضافة محتوى جديد</h3>
               <div className="space-y-2">
                 <Link href="/admin/content?type=article&action=new">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm cursor-pointer">
                     <FileText className="w-4 h-4 ml-2" />
                     مقال علمي جديد
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/admin/content?type=ebook&action=new">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm cursor-pointer">
                     <BookOpen className="w-4 h-4 ml-2" />
                     كتاب إلكتروني جديد
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/admin/content?type=project&action=new">
-                  <a className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm">
+                  <span className="flex items-center p-2 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors text-sm cursor-pointer">
                     <GraduationCap className="w-4 h-4 ml-2" />
                     مشروع تخرج جديد
-                  </a>
+                  </span>
                 </Link>
               </div>
             </div>
@@ -208,10 +208,12 @@ export default function AdminDashboard() {
                       <p className="text-lg font-bold">إضافة سريعة</p>
                     </div>
                     <Link href="/admin/content?action=new">
-                      <Button className="bg-primary hover:bg-primary-dark">
-                        <PlusCircle className="h-4 w-4 ml-1" />
-                        إضافة
-                      </Button>
+                      <div className="cursor-pointer">
+                        <Button className="bg-primary hover:bg-primary-dark">
+                          <PlusCircle className="h-4 w-4 ml-1" />
+                          إضافة
+                        </Button>
+                      </div>
                     </Link>
                   </div>
                 </CardContent>
@@ -253,7 +255,9 @@ export default function AdminDashboard() {
                     )}
                     <div className="mt-4 flex justify-end">
                       <Link href="/admin/users">
-                        <Button variant="outline">إدارة المستخدمين</Button>
+                        <div className="cursor-pointer">
+                          <Button variant="outline">إدارة المستخدمين</Button>
+                        </div>
                       </Link>
                     </div>
                   </CardContent>
@@ -289,7 +293,9 @@ export default function AdminDashboard() {
                     )}
                     <div className="mt-4 flex justify-end">
                       <Link href="/admin/content">
-                        <Button variant="outline">إدارة المحتوى</Button>
+                        <div className="cursor-pointer">
+                          <Button variant="outline">إدارة المحتوى</Button>
+                        </div>
                       </Link>
                     </div>
                   </CardContent>
