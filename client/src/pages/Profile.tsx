@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserByUid, db, storage } from "@/lib/firebase";
 import { 
@@ -466,31 +466,33 @@ export default function Profile() {
                     <dt className="text-sm font-medium text-neutral-500">لوحة تحكم المسؤول</dt>
                     <dd className="mt-2">
                       <div className="space-y-2">
-                        <Link href="/admin/dashboard">
-                          <div className="cursor-pointer">
-                            <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
-                              <LayoutDashboard className="h-4 w-4 ml-2" />
-                              الذهاب إلى لوحة التحكم
-                            </Button>
-                          </div>
-                        </Link>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-primary text-primary hover:bg-primary hover:text-white"
+                          onClick={() => navigate("/admin/dashboard")}
+                        >
+                          <LayoutDashboard className="h-4 w-4 ml-2" />
+                          الذهاب إلى لوحة التحكم
+                        </Button>
                         <div className="grid grid-cols-2 gap-2">
-                          <Link href="/admin/users">
-                            <div className="cursor-pointer">
-                              <Button variant="outline" size="sm" className="w-full">
-                                <Users className="h-3 w-3 ml-1" />
-                                إدارة المستخدمين
-                              </Button>
-                            </div>
-                          </Link>
-                          <Link href="/admin/content">
-                            <div className="cursor-pointer">
-                              <Button variant="outline" size="sm" className="w-full">
-                                <FileText className="h-3 w-3 ml-1" />
-                                إدارة المحتوى
-                              </Button>
-                            </div>
-                          </Link>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => navigate("/admin/users")}
+                          >
+                            <Users className="h-3 w-3 ml-1" />
+                            إدارة المستخدمين
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => navigate("/admin/content")}
+                          >
+                            <FileText className="h-3 w-3 ml-1" />
+                            إدارة المحتوى
+                          </Button>
                         </div>
                       </div>
                     </dd>
