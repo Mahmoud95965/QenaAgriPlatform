@@ -17,12 +17,12 @@ export default function DepartmentsSection() {
             <h3 className="text-lg font-bold text-neutral-800 mb-2">البساتين</h3>
             <p className="text-neutral-600 text-sm mb-4">يهتم بدراسة زراعة وإنتاج المحاصيل البستانية كالفاكهة والخضروات والنباتات الزينة.</p>
             <Link href="/departments/horticulture">
-              <a className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors cursor-pointer">
                 عرض محتوى القسم
                 <svg className="ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
           
@@ -34,12 +34,12 @@ export default function DepartmentsSection() {
             <h3 className="text-lg font-bold text-neutral-800 mb-2">المحاصيل</h3>
             <p className="text-neutral-600 text-sm mb-4">يختص بدراسة طرق زراعة وإنتاج المحاصيل الحقلية وتحسين جودتها وإنتاجيتها.</p>
             <Link href="/departments/crops">
-              <a className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors cursor-pointer">
                 عرض محتوى القسم
                 <svg className="ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
           
@@ -51,12 +51,12 @@ export default function DepartmentsSection() {
             <h3 className="text-lg font-bold text-neutral-800 mb-2">علوم الأراضي والمياه</h3>
             <p className="text-neutral-600 text-sm mb-4">يهتم بدراسة خواص التربة الزراعية وتحسينها وإدارة الموارد المائية بكفاءة.</p>
             <Link href="/departments/soil">
-              <a className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors cursor-pointer">
                 عرض محتوى القسم
                 <svg className="ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
           
@@ -68,24 +68,24 @@ export default function DepartmentsSection() {
             <h3 className="text-lg font-bold text-neutral-800 mb-2">وقاية النبات</h3>
             <p className="text-neutral-600 text-sm mb-4">يختص بدراسة الآفات والأمراض التي تصيب النباتات وطرق مكافحتها والوقاية منها.</p>
             <Link href="/departments/protection">
-              <a className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors">
+              <span className="text-primary font-medium hover:text-primary-dark text-sm inline-flex items-center justify-center transition-colors cursor-pointer">
                 عرض محتوى القسم
                 <svg className="ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </span>
             </Link>
           </div>
         </div>
         
         <div className="mt-8 text-center">
           <Link href="/departments">
-            <a className="text-primary-dark font-medium hover:text-primary inline-flex items-center justify-center transition-colors">
+            <span className="text-primary-dark font-medium hover:text-primary inline-flex items-center justify-center transition-colors cursor-pointer">
               عرض جميع الأقسام
               <svg className="ml-1 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-            </a>
+            </span>
           </Link>
         </div>
       </div>
