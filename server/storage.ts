@@ -2,7 +2,7 @@ import { users, contents, type User, type Content, type InsertUser, type InsertC
   UserRole, Department, type UserRoleType, type DepartmentType } from "@shared/schema";
 import { IStorage } from "@shared/index";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
@@ -133,18 +133,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    // Use raw SQL to insert user to avoid type issues
-    const [user] = await db.insert(users).values({
-      uid: insertUser.uid,
-      email: insertUser.email,
-      username: insertUser.username,
-      displayName: insertUser.displayName,
-      role: insertUser.role as any, // Cast to any to avoid type errors
-      department: insertUser.department || null,
-      studentId: insertUser.studentId || null,
-      profilePicture: insertUser.profilePicture || null
-    }).returning();
-    return user;
+    // Use raw SQL to avoid type issues
+    const result = await db.execute(sql`
+      INSERT INTO users (uid, email, username, display_name, role, department, student_id, profile_picture)
+      VALUES (
+        ${insertUser.uid},
+        ${insertUser.email},
+        ${insertUser.username},
+        ${insertUser.displayName},
+        ${insertUser.role},
+        ${insertUser.department || null},
+        ${insertUser.studentId || null},
+        ${insertUser.profilePicture || null}
+      )
+      RETURNING *
+    `);
+    
+    return result.rows[0] as User;
   }
 
   async getAllContent(): Promise<Content[]> {
@@ -195,21 +200,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createContent(content: InsertContent): Promise<Content> {
-    // Use direct insert to avoid type issues
-    const [newContent] = await db.insert(contents).values({
-      title: content.title,
-      description: content.description,
-      contentType: content.contentType as any, // Cast to any to avoid type errors
-      department: content.department as any || null, // Cast to any to avoid type errors
-      fileUrl: content.fileUrl || null,
-      articleTextPath: content.articleTextPath || null,
-      externalLink: content.externalLink || null,
-      authorId: content.authorId || null,
-      authorName: content.authorName,
-      studentYear: content.studentYear || null,
-      thumbnailUrl: content.thumbnailUrl || null
-    }).returning();
-    return newContent;
+    // Use raw SQL to avoid type issues
+    const result = await db.execute(sql`
+      INSERT INTO contents (
+        title, description, content_type, department, 
+        file_url, article_text_path, external_link, 
+        author_id, author_name, student_year, thumbnail_url
+      )
+      VALUES (
+        ${content.title},
+        ${content.description},
+        ${content.contentType},
+        ${content.department || null},
+        ${content.fileUrl || null},
+        ${content.articleTextPath || null},
+        ${content.externalLink || null},
+        ${content.authorId || null},
+        ${content.authorName},
+        ${content.studentYear || null},
+        ${content.thumbnailUrl || null}
+      )
+      RETURNING *
+    `);
+    
+    return result.rows[0] as Content;
   }
 
   async updateContent(id: number, contentUpdate: Partial<InsertContent>): Promise<Content | null> {
