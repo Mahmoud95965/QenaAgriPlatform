@@ -61,6 +61,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAdmin = userData?.role === UserRole.ADMIN;
   const isProfessor = userData?.role === UserRole.PROFESSOR;
   const isStudent = userData?.role === UserRole.STUDENT;
+  
+  // للتصحيح: طباعة البيانات في وحدة التحكم
+  console.log("AuthContext - userData:", userData);
+  console.log("AuthContext - user roles:", { isAdmin, isProfessor, isStudent });
 
   const value = {
     user,
