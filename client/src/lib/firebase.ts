@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, deleteDoc, updateDoc, orderBy, limit, DocumentData, QuerySnapshot } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import * as XLSX from 'xlsx';
-import { User, UserRole, InsertUser, ContentType, InsertContent } from "@shared/schema";
+import { User, UserRole, UserRoleType, InsertUser, ContentType, InsertContent } from "@shared/schema";
 
 // Firebase configuration - ideally these would be environment variables
 const firebaseConfig = {
@@ -114,7 +114,7 @@ export const createUsersFromExcel = async (file: File): Promise<{ success: Excel
             await registerWithEmailPassword(user.email, user.password, {
               displayName: user.name,
               username: user.email.split('@')[0],
-              role: user.role as UserRole[keyof typeof UserRole],
+              role: user.role as string,
               department: user.department,
               studentId: user.studentId
             });
@@ -175,12 +175,12 @@ export const deleteContent = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, "contents", id));
 };
 
-export const getContentByType = async (contentType: string, departmentFilter?: string, limit = 10): Promise<DocumentData[]> => {
+export const getContentByType = async (contentType: string, departmentFilter?: string, limitCount = 10): Promise<DocumentData[]> => {
   let q = query(
     collection(db, "contents"),
     where("contentType", "==", contentType),
     orderBy("createdAt", "desc"),
-    limit(limit)
+    limit(limitCount)
   );
   
   if (departmentFilter) {
@@ -189,7 +189,7 @@ export const getContentByType = async (contentType: string, departmentFilter?: s
       where("contentType", "==", contentType),
       where("department", "==", departmentFilter),
       orderBy("createdAt", "desc"),
-      limit(limit)
+      limit(limitCount)
     );
   }
   
@@ -200,11 +200,11 @@ export const getContentByType = async (contentType: string, departmentFilter?: s
   }));
 };
 
-export const getRecentContent = async (limit = 6): Promise<DocumentData[]> => {
+export const getRecentContent = async (limitCount = 6): Promise<DocumentData[]> => {
   const q = query(
     collection(db, "contents"),
     orderBy("createdAt", "desc"),
-    limit(limit)
+    limit(limitCount)
   );
   
   const querySnapshot = await getDocs(q);
