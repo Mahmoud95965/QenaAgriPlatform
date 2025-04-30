@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ContentType } from "@shared/schema";
 import { format } from "date-fns";
 import { arEG } from "date-fns/locale";
-import { ExternalLink, Download } from "lucide-react";
+import { ExternalLink, Download, FileText, File } from "lucide-react";
 
 interface ContentCardProps {
   content: {
@@ -79,6 +79,7 @@ export default function ContentCard({ content }: ContentCardProps) {
   };
 
   const renderActionButton = () => {
+    // إذا كان هناك رابط خارجي
     if (content.externalLink) {
       return (
         <a 
@@ -91,7 +92,41 @@ export default function ContentCard({ content }: ContentCardProps) {
           <ExternalLink className="ml-1 w-4 h-4" />
         </a>
       );
-    } else if (content.fileUrl) {
+    } 
+    // إذا كان هناك ملف وكان المحتوى من نوع مقال
+    else if (content.fileUrl && content.contentType === ContentType.ARTICLE) {
+      // تحقق مما إذا كان رابط الملف يشير إلى مقال نصي
+      const isTextArticle = content.fileUrl.includes('/api/articles/text/');
+      
+      return (
+        <div className="flex items-center space-x-reverse space-x-4">
+          <a 
+            href={content.fileUrl} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors"
+          >
+            {getActionText()}
+            <FileText className="ml-1 w-4 h-4" />
+          </a>
+          
+          {isTextArticle && (
+            <a 
+              href={content.fileUrl.replace('/text/', '/pdf/')
+                  .replace(/\.txt$/, '.pdf')} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors"
+            >
+              تنزيل PDF
+              <File className="ml-1 w-4 h-4" />
+            </a>
+          )}
+        </div>
+      );
+    }
+    // إذا كان هناك ملف ولم يكن المحتوى من نوع مقال
+    else if (content.fileUrl) {
       return (
         <a 
           href={content.fileUrl} 
@@ -103,7 +138,9 @@ export default function ContentCard({ content }: ContentCardProps) {
           <Download className="ml-1 w-4 h-4" />
         </a>
       );
-    } else {
+    } 
+    // إذا لم يكن هناك ملف أو رابط خارجي
+    else {
       return (
         <Link href={getContentLink()}>
           <span className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors cursor-pointer">
