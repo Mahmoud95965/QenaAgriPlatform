@@ -51,27 +51,27 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/">
-                  <a className="text-neutral-400 hover:text-white transition-colors">الصفحة الرئيسية</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">الصفحة الرئيسية</span>
                 </Link>
               </li>
               <li>
                 <Link href="/articles">
-                  <a className="text-neutral-400 hover:text-white transition-colors">المقالات العلمية</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">المقالات العلمية</span>
                 </Link>
               </li>
               <li>
                 <Link href="/projects">
-                  <a className="text-neutral-400 hover:text-white transition-colors">مشاريع التخرج</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">مشاريع التخرج</span>
                 </Link>
               </li>
               <li>
                 <Link href="/ebooks">
-                  <a className="text-neutral-400 hover:text-white transition-colors">المكتبة الإلكترونية</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">المكتبة الإلكترونية</span>
                 </Link>
               </li>
               <li>
                 <Link href="/departments">
-                  <a className="text-neutral-400 hover:text-white transition-colors">الأقسام</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">الأقسام</span>
                 </Link>
               </li>
             </ul>
@@ -83,22 +83,22 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/faq">
-                  <a className="text-neutral-400 hover:text-white transition-colors">الأسئلة الشائعة</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">الأسئلة الشائعة</span>
                 </Link>
               </li>
               <li>
                 <Link href="/contact">
-                  <a className="text-neutral-400 hover:text-white transition-colors">اتصل بنا</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">اتصل بنا</span>
                 </Link>
               </li>
               <li>
                 <Link href="/terms">
-                  <a className="text-neutral-400 hover:text-white transition-colors">الشروط والأحكام</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">الشروط والأحكام</span>
                 </Link>
               </li>
               <li>
                 <Link href="/privacy">
-                  <a className="text-neutral-400 hover:text-white transition-colors">سياسة الخصوصية</a>
+                  <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</span>
                 </Link>
               </li>
             </ul>
