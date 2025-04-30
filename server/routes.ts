@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
+import { upload, handleUploadErrors, deleteFile, getFilePath } from "./fileStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints prefix
@@ -85,6 +87,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // In a real implementation, you would verify the Firebase token
     // Here we just acknowledge the request as this is handled client-side
     res.json({ message: 'Token verification handled client-side with Firebase' });
+  });
+  
+  // مسارات رفع وتنزيل الملفات
+  
+  // مسار لرفع ملف جديد
+  app.post(`${apiPrefix}/upload`, upload.single('file'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'لم يتم تقديم أي ملف' });
+      }
+      
+      const file = req.file;
+      const contentType = req.body.contentType;
+      
+      // استعادة عنوان URL للملف المرفوع (يتم استخدامه للتنزيل لاحقًا)
+      const fileUrl = `/api/download/${contentType}/${file.filename}`;
+      
+      return res.status(200).json({
+        message: 'تم رفع الملف بنجاح',
+        file: {
+          originalName: file.originalname,
+          filename: file.filename,
+          size: file.size,
+          mimetype: file.mimetype,
+        },
+        fileUrl: fileUrl,
+      });
+    } catch (error) {
+      console.error('خطأ في معالجة رفع الملف:', error);
+      return res.status(500).json({ error: 'فشل في رفع الملف' });
+    }
+  }, handleUploadErrors);
+  
+  // مسار لتنزيل ملف
+  app.get(`${apiPrefix}/download/:contentType/:filename`, (req, res) => {
+    try {
+      const { contentType, filename } = req.params;
+      
+      // الحصول على المسار الكامل للملف
+      const filePath = getFilePath(contentType, filename);
+      
+      // التحقق من وجود الملف
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'الملف غير موجود' });
+      }
+      
+      // إرسال الملف
+      return res.download(filePath);
+    } catch (error) {
+      console.error('خطأ في تنزيل الملف:', error);
+      return res.status(500).json({ error: 'فشل في تنزيل الملف' });
+    }
+  });
+  
+  // مسار لحذف ملف
+  app.delete(`${apiPrefix}/files/:contentType/:filename`, (req, res) => {
+    try {
+      const { contentType, filename } = req.params;
+      
+      // الحصول على المسار الكامل للملف
+      const filePath = getFilePath(contentType, filename);
+      
+      // محاولة حذف الملف
+      const deleted = deleteFile(filePath);
+      
+      if (deleted) {
+        return res.status(200).json({ message: 'تم حذف الملف بنجاح' });
+      } else {
+        return res.status(404).json({ error: 'الملف غير موجود أو لا يمكن حذفه' });
+      }
+    } catch (error) {
+      console.error('خطأ في حذف الملف:', error);
+      return res.status(500).json({ error: 'فشل في حذف الملف' });
+    }
   });
 
   // Create HTTP server
