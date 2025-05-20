@@ -190,44 +190,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== مسارات خاصة بالمقالات النصية ====================
   
   // حفظ مقال نصي جديد
-  app.post(`${apiPrefix}/articles/text`, async (req: Request, res: Response) => {
+  app.post(`${apiPrefix}/articles/text`, async (req, res) => {
     try {
       const { id, title, content } = req.body;
-      
       if (!id || !title || !content) {
-        return res.status(400).json({ error: 'جميع الحقول (id, title, content) مطلوبة' });
+        return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
       }
-      
+
       const fileName = await saveArticleText(id, title, content);
-      
-      return res.status(200).json({
-        message: 'تم حفظ المقال بنجاح',
-        fileName: fileName,
-        fileUrl: `/api/articles/text/${fileName}`
-      });
+      res.json({ fileName });
     } catch (error) {
-      console.error('خطأ في حفظ المقال:', error);
-      return res.status(500).json({ error: 'فشل في حفظ المقال', details: (error as Error).message });
+      console.error('Error saving article:', error);
+      res.status(500).json({ error: 'حدث خطأ أثناء حفظ المقال' });
     }
   });
   
   // قراءة محتوى مقال نصي
-  app.get(`${apiPrefix}/articles/text/:fileName`, async (req: Request, res: Response) => {
+  app.get(`${apiPrefix}/articles/text/:fileName`, async (req, res) => {
     try {
-      const fileName = req.params.fileName;
+      let { fileName } = req.params;
       
-      if (!fileName) {
-        return res.status(400).json({ error: 'اسم الملف مطلوب' });
+      // Ensure proper file extension
+      if (fileName.endsWith('.txt')) {
+        fileName = fileName.replace('.txt', '.html');
+      } else if (!fileName.includes('.')) {
+        fileName = `${fileName}.html`;
       }
-      
+
       const content = await readArticleText(fileName);
       
-      return res.status(200).json({
-        content: content
-      });
+      // Set proper headers
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      
+      // Send the content
+      res.send(content);
     } catch (error) {
-      console.error('خطأ في قراءة المقال:', error);
-      return res.status(404).json({ error: 'المقال غير موجود', details: (error as Error).message });
+      console.error('Error reading article:', error);
+      res.status(404).json({ error: 'المقال غير موجود' });
     }
   });
   

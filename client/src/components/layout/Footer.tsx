@@ -82,7 +82,7 @@ export default function Footer() {
             <h3 className="text-lg font-bold mb-4">الدعم</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/faq">
+                <Link href="/legal/faq">
                   <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">الأسئلة الشائعة</span>
                 </Link>
               </li>
@@ -92,12 +92,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/terms">
+                <Link href="/legal/terms">
                   <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">الشروط والأحكام</span>
                 </Link>
               </li>
               <li>
-                <Link href="/privacy">
+                <Link href="/legal/privacy">
                   <span className="text-neutral-400 hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</span>
                 </Link>
               </li>
