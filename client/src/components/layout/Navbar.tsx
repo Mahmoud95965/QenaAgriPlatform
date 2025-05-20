@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { logoutUser } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu, GraduationCap, X, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,7 +22,7 @@ interface NavbarProps {
 export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
   const [location] = useLocation();
   const { toast } = useToast();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, userData } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -94,6 +94,11 @@ export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
                 الأقسام
               </span>
             </Link>
+            <Link href="/contact">
+              <span className={`text-${location === "/contact" ? "primary" : "neutral-600"} font-medium py-2 border-b-2 ${location === "/contact" ? "border-primary" : "border-transparent hover:border-primary"} hover:text-primary transition-colors cursor-pointer`}>
+                تواصل معنا
+              </span>
+            </Link>
           </nav>
           
           {/* User menu or login/signup buttons */}
@@ -104,7 +109,13 @@ export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
                   <Button variant="ghost" className="flex items-center text-sm font-medium text-neutral-700 hover:text-primary focus:outline-none transition duration-150 ease-in-out">
                     <Avatar className="h-8 w-8 mr-0 md:mr-2">
                       <AvatarImage src={user.photoURL || undefined} alt={user.displayName || "صورة المستخدم"} />
-                      <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>
+                        {userData?.role === "student" ? (
+                          <GraduationCap className="h-4 w-4" />
+                        ) : (
+                          user.displayName?.charAt(0) || user.email?.charAt(0)
+                        )}
+                      </AvatarFallback>
                     </Avatar>
                     <span className="hidden md:block">{user.displayName || user.email}</span>
                     <ChevronDown className="h-4 w-4 ml-1" />
@@ -177,7 +188,7 @@ export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
             <Link href="/articles">
               <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/articles" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
                 <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4 0h4" />
                 </svg>
                 المقالات العلمية
               </div>
@@ -206,7 +217,14 @@ export default function Navbar({ onOpenLogin, onOpenSignup }: NavbarProps) {
                 الأقسام
               </div>
             </Link>
-            
+            <Link href="/contact">
+              <div className={`flex items-center px-4 py-2 text-base font-medium ${location === "/contact" ? "text-primary bg-neutral-100" : "text-neutral-600 hover:text-primary hover:bg-neutral-100"} rounded-md transition-colors cursor-pointer`}>
+                <svg className="ml-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.86 5.24a2 2 0 002.28 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                تواصل معنا
+              </div>
+            </Link>
             {!user && (
               <Button 
                 className="mt-4 w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors"

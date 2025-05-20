@@ -1,41 +1,45 @@
 import React from "react";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { Globe, Sprout, FlaskRound, Shield, Leaf, Wheat, Droplets, Bug } from "lucide-react";
+import { Globe, Sprout, FlaskRound, Shield, Leaf, Wheat, Droplets, Bug, FileText, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Departments() {
+  const { user } = useAuth();
+  
   const departments = [
     {
       id: "horticulture",
-      name: "البساتين",
-      description: "يهتم بدراسة زراعة وإنتاج المحاصيل البستانية كالفاكهة والخضروات والنباتات الزينة وتكنولوجيا ما بعد الحصاد.",
-      icon: <Sprout className="w-10 h-10 text-primary" />,
-      features: ["إنتاج الفاكهة", "إنتاج الخضر", "نباتات الزينة", "تكنولوجيا ما بعد الحصاد"],
-      image: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+      name: "قسم البساتين",
+      description: "يهتم بدراسة وإنتاج محاصيل الفاكهة والخضر ونباتات الزينة",
+      icon: <FlaskRound className="w-12 h-12 text-primary" />,
+      path: "/departments/horticulture",
+      contentPath: "/departments/horticulture/content"
     },
     {
       id: "crops",
-      name: "المحاصيل",
-      description: "يختص بدراسة طرق زراعة وإنتاج المحاصيل الحقلية وتحسين جودتها وإنتاجيتها وتربية النباتات.",
-      icon: <Wheat className="w-10 h-10 text-primary" />,
-      features: ["المحاصيل الحقلية", "تربية نبات", "فسيولوجيا المحاصيل", "إنتاج البذور"],
-      image: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+      name: "قسم المحاصيل",
+      description: "يهتم بدراسة وإنتاج المحاصيل الحقلية المختلفة",
+      icon: <FlaskRound className="w-12 h-12 text-primary" />,
+      path: "/departments/crops",
+      contentPath: "/departments/crops/content"
     },
     {
       id: "soil",
-      name: "علوم الأراضي والمياه",
-      description: "يهتم بدراسة خواص التربة الزراعية وتحسينها وإدارة الموارد المائية بكفاءة وتكنولوجيا الري الحديثة.",
-      icon: <Droplets className="w-10 h-10 text-primary" />,
-      features: ["خصوبة التربة", "تغذية النبات", "تكنولوجيا الري", "استصلاح الأراضي"],
-      image: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+      name: "قسم الأراضي والمياه",
+      description: "يهتم بدراسة علوم التربة والمياه وإدارتها",
+      icon: <FlaskRound className="w-12 h-12 text-primary" />,
+      path: "/departments/soil",
+      contentPath: "/departments/soil/content"
     },
     {
       id: "protection",
-      name: "وقاية النبات",
-      description: "يختص بدراسة الآفات والأمراض التي تصيب النباتات وطرق مكافحتها والوقاية منها باستخدام الطرق المتكاملة.",
-      icon: <Shield className="w-10 h-10 text-primary" />,
-      features: ["أمراض النبات", "حشرات اقتصادية", "مبيدات", "مكافحة حيوية"],
-      image: "https://images.unsplash.com/photo-1598512191408-e8aa245d9893?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+      name: "قسم وقاية النبات",
+      description: "يهتم بدراسة أمراض وآفات النباتات وطرق مكافحتها",
+      icon: <FlaskRound className="w-12 h-12 text-primary" />,
+      path: "/departments/protection",
+      contentPath: "/departments/protection/content"
     },
     {
       id: "dairy",
@@ -81,44 +85,44 @@ export default function Departments() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {departments.map((dept) => (
-            <Card key={dept.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={dept.image} 
-                  alt={dept.name}
-                  className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                <div className="absolute bottom-4 right-4 flex items-center">
-                  <div className="bg-white bg-opacity-90 p-2 rounded-full">
+            <Card key={dept.id} className="overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-4 rtl:space-x-reverse mb-4">
+                  <div className="flex-shrink-0">
                     {dept.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mr-3">{dept.name}</h3>
+                  <div>
+                    <h2 className="text-xl font-semibold mb-2">{dept.name}</h2>
+                    <p className="text-muted-foreground">{dept.description}</p>
+                  </div>
                 </div>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-neutral-600 mb-4">{dept.description}</p>
-                <div className="mb-4">
-                  <h4 className="text-lg font-bold text-neutral-800 mb-2">التخصصات:</h4>
-                  <ul className="grid grid-cols-2 gap-2">
-                    {dept.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm text-neutral-600">
-                        <span className="w-2 h-2 bg-primary rounded-full ml-2"></span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <Link href={dept.path}>
+                    <Button variant="outline" className="w-full sm:w-auto">
+                      <FileText className="w-4 h-4 ml-2" />
+                      عرض القسم
+                    </Button>
+                  </Link>
+                  
+                  <Link href={dept.contentPath}>
+                    <Button variant="secondary" className="w-full sm:w-auto">
+                      <FileText className="w-4 h-4 ml-2" />
+                      محتوى القسم
+                    </Button>
+                  </Link>
+                  
+                  {user && (
+                    <Link href={`${dept.path}/submit-research`}>
+                      <Button variant="default" className="w-full sm:w-auto">
+                        <Upload className="w-4 h-4 ml-2" />
+                        تقديم بحث
+                      </Button>
+                    </Link>
+                  )}
                 </div>
-                <Link href={`/departments/${dept.id}`}>
-                  <a className="text-primary font-medium hover:text-primary-dark inline-flex items-center transition-colors">
-                    عرض محتوى القسم
-                    <svg className="ml-1 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </a>
-                </Link>
               </CardContent>
             </Card>
           ))}

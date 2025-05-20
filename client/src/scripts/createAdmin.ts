@@ -1,20 +1,32 @@
 import { createUserWithEmailAndPassword, updateProfile, getAuth } from "firebase/auth";
 import { doc, setDoc, getFirestore } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp } from "firebase/app";
 import { UserRole } from "@shared/schema";
+import { getAnalytics } from "firebase/analytics";
 
-// Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-key",
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-project"}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-project",
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-project"}.appspot.com`,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "demo-sender-id",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "demo-app-id"
+  apiKey: "AIzaSyAOv_iv-4ABm47wwxnP1MOtUHvDnqYCKvA",
+  authDomain: "agriqena-159208.firebaseapp.com",
+  databaseURL: "https://agriqena-159208-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "agriqena-159208",
+  storageBucket: "agriqena-159208.firebasestorage.app",
+  messagingSenderId: "933041452699",
+  appId: "1:933041452699:web:e1164cb9aacd36ae47b83e",
+  measurementId: "G-8F9CQBNQ3K"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only if not already initialized
+let app;
+let analytics;
+try {
+  app = initializeApp(firebaseConfig);
+  analytics = getAnalytics(app);
+} catch (error) {
+  // If Firebase is already initialized, get the existing app
+  app = getApp();
+  analytics = getAnalytics(app);
+}
+
 const auth = getAuth(app);
 const db = getFirestore(app);
 

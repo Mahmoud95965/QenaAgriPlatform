@@ -11,7 +11,9 @@ import {
   Upload, 
   LayoutDashboard,
   UserPlus,
-  UserCheck
+  UserCheck,
+  GraduationCap,
+  User
 } from "lucide-react";
 import { createUsersFromExcel, db, updateUserRole } from "@/lib/firebase";
 import { 
@@ -296,33 +298,42 @@ export default function ManageUsers() {
     });
     
     try {
-      // Process Excel file
-      const result = await createUsersFromExcel(excelFile);
-      
-      // Update upload progress
-      setUploadProgress({
-        total: result.success.length + result.failed.length,
-        current: result.success.length + result.failed.length,
-        success: result.success.length,
-        failed: result.failed.length
+      // Process Excel file with progress updates
+      const result = await createUsersFromExcel(excelFile, (progress) => {
+        setUploadProgress({
+          total: progress.total,
+          current: progress.current,
+          success: progress.success,
+          failed: progress.failed
+        });
       });
       
-      // Show toast based on result
+      // حساب النسب المئوية
+      const totalUsers = result.success.length + result.failed.length;
+      const successPercentage = Math.round((result.success.length / totalUsers) * 100);
+      const failedPercentage = Math.round((result.failed.length / totalUsers) * 100);
+      
+      // عرض ملخص النتائج
       if (result.failed.length === 0) {
         toast({
           title: "تم إنشاء المستخدمين بنجاح",
-          description: `تم إنشاء ${result.success.length} مستخدم بنجاح`,
+          description: `تم إنشاء ${result.success.length} مستخدم بنجاح (100%)`,
         });
       } else if (result.success.length === 0) {
         toast({
-          title: "فشل إنشاء المستخدمين",
-          description: `فشل إنشاء ${result.failed.length} مستخدم`,
-          variant: "destructive",
+          title: "لم يتم إنشاء أي مستخدمين",
+          description: `جميع المستخدمين مسجلين بالفعل (${failedPercentage}%)`,
+          variant: "default",
         });
       } else {
         toast({
           title: "تم إنشاء بعض المستخدمين",
-          description: `تم إنشاء ${result.success.length} مستخدم بنجاح وفشل ${result.failed.length}`,
+          description: (
+            <div className="space-y-1">
+              <p>تم إنشاء {result.success.length} مستخدم بنجاح ({successPercentage}%)</p>
+              <p>{result.failed.length} مستخدم مسجلين بالفعل ({failedPercentage}%)</p>
+            </div>
+          ),
           variant: "default",
         });
       }
@@ -349,6 +360,12 @@ export default function ManageUsers() {
           if (querySnapshot.docs.length > 0) {
             setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
           }
+        }, 2000);
+      } else {
+        // إذا لم يتم إنشاء أي مستخدمين، أغلق النافذة بعد عرض النتائج
+        setTimeout(() => {
+          setIsUploadDialogOpen(false);
+          setExcelFile(null);
         }, 2000);
       }
     } catch (error) {
@@ -489,7 +506,13 @@ export default function ManageUsers() {
                                 <div className="flex items-center space-x-reverse space-x-3">
                                   <Avatar className="h-8 w-8">
                                     <AvatarImage src={user.profilePicture} alt={user.displayName} />
-                                    <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>
+                                      {user.role === UserRole.STUDENT ? (
+                                        <GraduationCap className="h-4 w-4" />
+                                      ) : (
+                                        user.displayName?.charAt(0) || user.email?.charAt(0)
+                                      )}
+                                    </AvatarFallback>
                                   </Avatar>
                                   <div>
                                     <p className="font-medium">{user.displayName}</p>
@@ -508,7 +531,14 @@ export default function ManageUsers() {
                                       ? "secondary"
                                       : "default"
                                 }>
-                                  {userRoleLabels[user.role]}
+                                  {user.role === UserRole.STUDENT ? (
+                                    <div className="flex items-center gap-1">
+                                      <GraduationCap className="w-4 h-4" />
+                                      {userRoleLabels[user.role]}
+                                    </div>
+                                  ) : (
+                                    userRoleLabels[user.role]
+                                  )}
                                 </Badge>
                               </TableCell>
                               <TableCell>
@@ -690,7 +720,7 @@ export default function ManageUsers() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-2 space-y-4">
+          <div className="space-y-4">
             <div className="bg-neutral-50 p-4 rounded-md text-sm text-neutral-700">
               <p className="font-bold mb-2">معلومات هامة عن تنسيق الملف:</p>
               <div className="space-y-3">
@@ -716,43 +746,45 @@ export default function ManageUsers() {
               </div>
             </div>
             
-            <div>
-              <div className="mt-2 flex items-center gap-4">
-                <Button
-                  variant="outline"
-                  onClick={() => document.getElementById("excel-file")?.click()}
-                  disabled={isUploading}
-                >
-                  <Upload className="w-4 h-4 ml-2" />
-                  اختر ملف Excel
-                </Button>
-                {excelFile && (
-                  <span className="text-sm text-neutral-600">
-                    {excelFile.name}
-                  </span>
-                )}
-              </div>
-              <input
-                id="excel-file"
-                type="file"
-                accept=".xlsx,.xls"
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setExcelFile(e.target.files[0]);
-                  }
-                }}
+            <div className="mt-2 flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={() => document.getElementById("excel-file")?.click()}
                 disabled={isUploading}
-              />
+              >
+                <Upload className="w-4 h-4 ml-2" />
+                اختر ملف Excel
+              </Button>
+              {excelFile && (
+                <span className="text-sm text-neutral-600">
+                  {excelFile.name}
+                </span>
+              )}
             </div>
+            <input
+              id="excel-file"
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setExcelFile(e.target.files[0]);
+                }
+              }}
+              disabled={isUploading}
+            />
             
             {isUploading && (
               <div className="space-y-2">
+                <div className="flex justify-between text-sm text-neutral-600">
+                  <span>النسبة المئوية: {Math.round((uploadProgress.current / uploadProgress.total) * 100)}%</span>
+                  <span>المستخدم الحالي: {uploadProgress.current} من {uploadProgress.total}</span>
+                </div>
                 <Progress value={(uploadProgress.current / uploadProgress.total) * 100} />
                 <div className="flex justify-between text-xs text-neutral-500">
                   <span>العدد الكلي: {uploadProgress.total}</span>
-                  <span>نجح: {uploadProgress.success}</span>
-                  <span>فشل: {uploadProgress.failed}</span>
+                  <span className="text-green-600">نجح: {uploadProgress.success}</span>
+                  <span className="text-red-600">فشل: {uploadProgress.failed}</span>
                 </div>
               </div>
             )}

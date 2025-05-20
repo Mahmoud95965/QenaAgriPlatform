@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth, getUserByUid, createUserDocument } from "@/lib/firebase";
 import { UserRole } from "@shared/schema";
@@ -27,7 +27,7 @@ export function useAuth() {
 }
 
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {

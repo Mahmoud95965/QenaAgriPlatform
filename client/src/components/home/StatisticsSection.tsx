@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { ContentType, type Content } from "@shared/schema";
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Newspaper, Library, GraduationCap, UserCheck } from "lucide-react";
+import { collection, getCountFromServer } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface Stats {
   articles: number;
@@ -8,64 +11,68 @@ interface Stats {
   users: number;
 }
 
-// واجهة للمحتوى المستلم من الخادم
-interface ContentResponse {
-  id: number;
-  contentType: string;
-  title: string;
-  description: string;
-  [key: string]: any;
-}
-
 export default function StatisticsSection() {
   const [stats, setStats] = useState<Stats>({
     articles: 0,
     books: 0,
     projects: 0,
-    users: 0,
+    users: 0
+  });
+  const [displayStats, setDisplayStats] = useState<Stats>({
+    articles: 0,
+    books: 0,
+    projects: 0,
+    users: 0
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // جلب إحصائيات المحتوى من الخادم
-        const contentsResponse = await fetch('/api/contents');
+        const [articlesSnapshot, booksSnapshot, projectsSnapshot, usersSnapshot] = await Promise.all([
+          getCountFromServer(collection(db, "articles")),
+          getCountFromServer(collection(db, "books")),
+          getCountFromServer(collection(db, "projects")),
+          getCountFromServer(collection(db, "users"))
+        ]);
+
+        const newStats = {
+          articles: articlesSnapshot.data().count,
+          books: booksSnapshot.data().count,
+          projects: projectsSnapshot.data().count,
+          users: usersSnapshot.data().count
+        };
+        setStats(newStats);
         
-        if (!contentsResponse.ok) {
-          throw new Error('فشل في جلب المحتوى');
-        }
+        // Start counting animation
+        const duration = 2000; // 2 seconds
+        const steps = 50;
+        const interval = duration / steps;
         
-        const contents: ContentResponse[] = await contentsResponse.json();
+        let currentStep = 0;
+        const timer = setInterval(() => {
+          currentStep++;
+          const progress = currentStep / steps;
+          
+          setDisplayStats({
+            articles: Math.floor(newStats.articles * progress),
+            books: Math.floor(newStats.books * progress),
+            projects: Math.floor(newStats.projects * progress),
+            users: Math.floor(newStats.users * progress)
+          });
+          
+          if (currentStep >= steps) {
+            clearInterval(timer);
+          }
+        }, interval);
         
-        // حساب الإحصائيات من البيانات المستلمة
-        const articlesCount = contents.filter(item => item.contentType === ContentType.ARTICLE).length;
-        const booksCount = contents.filter(item => item.contentType === ContentType.EBOOK).length;
-        const projectsCount = contents.filter(item => item.contentType === ContentType.PROJECT).length;
-        
-        // جلب إحصائيات المستخدمين
-        const usersResponse = await fetch('/api/users/count');
-        let usersCount = 0;
-        
-        if (usersResponse.ok) {
-          const usersData = await usersResponse.json();
-          usersCount = usersData.count || 0;
-        }
-        
-        setStats({
-          articles: articlesCount,
-          books: booksCount,
-          projects: projectsCount,
-          users: usersCount,
-        });
       } catch (error) {
-        console.error("Error fetching statistics:", error);
-        // استخدام عدد تقريبي في حالة الخطأ
+        console.error("Error fetching stats:", error);
         setStats({
           articles: 0,
           books: 0,
           projects: 0,
-          users: 0,
+          users: 0
         });
       } finally {
         setIsLoading(false);
@@ -76,42 +83,39 @@ export default function StatisticsSection() {
   }, []);
 
   return (
-    <section className="py-12 bg-primary-dark text-white">
-      <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">إحصائيات المنصة</h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Statistic 1 */}
-          <div className="text-center">
-            <div className="text-4xl font-bold mb-2">
-              {isLoading ? "..." : `${stats.articles}+`}
-            </div>
-            <p className="text-neutral-200">مقال علمي</p>
+    <section className="mb-12">
+      <h2 className="text-3xl font-bold mb-8 text-center">إحصائيات المنصة</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="p-6 text-center">
+          <Newspaper className="w-6 h-6 mx-auto mb-4 text-primary" />
+          <h3 className="text-2xl font-bold mb-2">
+            {isLoading ? "..." : `${displayStats.articles}+`}
+          </h3>
+          <p className="text-muted-foreground">مقال علمي</p>
           </div>
           
-          {/* Statistic 2 */}
-          <div className="text-center">
-            <div className="text-4xl font-bold mb-2">
-              {isLoading ? "..." : `${stats.books}+`}
-            </div>
-            <p className="text-neutral-200">كتاب إلكتروني</p>
+        <div className="p-6 text-center">
+          <Library className="w-6 h-6 mx-auto mb-4 text-primary" />
+          <h3 className="text-2xl font-bold mb-2">
+            {isLoading ? "..." : `${displayStats.books}+`}
+          </h3>
+          <p className="text-muted-foreground">كتاب إلكتروني</p>
           </div>
           
-          {/* Statistic 3 */}
-          <div className="text-center">
-            <div className="text-4xl font-bold mb-2">
-              {isLoading ? "..." : `${stats.projects}+`}
-            </div>
-            <p className="text-neutral-200">مشروع تخرج</p>
+        <div className="p-6 text-center">
+          <GraduationCap className="w-6 h-6 mx-auto mb-4 text-primary" />
+          <h3 className="text-2xl font-bold mb-2">
+            {isLoading ? "..." : `${displayStats.projects}+`}
+          </h3>
+          <p className="text-muted-foreground">مشروع تخرج</p>
           </div>
           
-          {/* Statistic 4 */}
-          <div className="text-center">
-            <div className="text-4xl font-bold mb-2">
-              {isLoading ? "..." : `${stats.users}+`}
-            </div>
-            <p className="text-neutral-200">مستخدم مسجل</p>
-          </div>
+        <div className="p-6 text-center">
+          <UserCheck className="w-6 h-6 mx-auto mb-4 text-primary" />
+          <h3 className="text-2xl font-bold mb-2">
+            {isLoading ? "..." : `${displayStats.users}+`}
+          </h3>
+          <p className="text-muted-foreground">مستخدم نشط</p>
         </div>
       </div>
     </section>
